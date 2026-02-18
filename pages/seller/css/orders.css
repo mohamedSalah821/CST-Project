@@ -1,0 +1,58 @@
+/* نفس روح التصميم */
+body { background: #f5f7fa; }
+
+
+
+.cardx{
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8eef6;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+}
+
+.cardx__head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 14px;
+  padding: 18px;
+  border-bottom: 1px solid #e8eef6;
+}
+
+.table-head th{
+  color: #64748b;
+  font-weight:600;
+  font-size: 13px;
+  border-bottom: 1px solid #e8eef6;
+}
+
+#ordersBody tr{
+  border-bottom: 1px solid #e8eef6;
+}
+#ordersBody tr:last-child{
+  border-bottom: none;
+}
+
+.badge-status{
+  display:inline-flex;
+  align-items:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+/* ألوان الحالات زي الصورة */
+.st-delivered{ background: rgba(13,110,253,.12); color: #0d6efd; }
+.st-shipped{ background: rgba(148,163,184,.18); color:#0f172a; }
+.st-processing{ background: rgba(13,110,253,.10); color:#0d6efd; border-color: rgba(13,110,253,.18); }
+.st-pending{ background: rgba(241,245,249,.9); color:#0f172a; border-color:#e2e8f0; }
+
+.icon-btn{
+  width:36px; height:36px;
+  border-radius: 10px;
+  border: 1px solid #e8eef6;
+  background: #fff;
+}
+.icon-btn:hover{ background:#f8fafc; }

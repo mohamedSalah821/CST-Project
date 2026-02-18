@@ -1,0 +1,14 @@
+body {
+    background: #f5f7fa;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.badge-status {
+    background: #e0edff;
+    color: #0d6efd;
+    padding: 5px 12px;
+    border-radius: 20px;
+}

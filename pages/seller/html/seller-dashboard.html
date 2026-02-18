@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saller Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="./../css/dashboard.css">
+    <link rel="stylesheet" href="./../css/sidebar.css">
+
+
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        
+
+            <div id="sidebar-container"></div>
+
+      
+        <!-- 🔹 Main Content -->
+        <main class="main-content p-4">
+            <h2> OVerview</h2>
+
+            <div class="mainwrapper">
+                <div class="container">
+                    <div class="row g-3">
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="p-3  rounded shadow-sm">
+                                <p>Total Revenue</p>
+                                <h1>589 $</h1>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="p-3  rounded shadow-sm">
+                                <p>Orders</p>
+                                <h1>5</h1>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="p-3  rounded shadow-sm">
+                                <p>Products</p>
+                                <h1>3</h1>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="p-3  rounded shadow-sm">
+                                <p>Average Order Value</p>
+                                <h1>7</h1>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="chart mt-4" style="max-width:800px; height:300px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+
+
+        </main>
+
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./../js/dashboard.js"></script>
+</body>
+
+
+
+
+</html>

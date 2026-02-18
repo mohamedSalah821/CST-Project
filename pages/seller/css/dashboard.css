@@ -1,0 +1,39 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+/* Layout */
+
+
+.main-content {
+    margin-left: 240px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f5f7fa;
+}
+
+/* Cards */
+.mainwrapper .col-lg-3 div {
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.mainwrapper .col-lg-3 div:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* Chart */
+.chart {
+    max-width: 800px;
+    height: 350px;
+    margin: 40px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    
+}
+
+
