@@ -20,25 +20,35 @@
 
   <main class="main-content p-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3>Manage Products</h3>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
-        <i class="fa-solid fa-plus me-2"></i>Add Product
-      </button>
-    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <h3 class="m-0">Manage Products</h3>
+
+  <div class="d-flex gap-2">
+    <button id="bulkDeleteBtn" class="btn btn-outline-danger" disabled>
+      <i class="fa-solid fa-trash me-2"></i>Delete Selected
+    </button>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">
+      <i class="fa-solid fa-plus me-2"></i>Add Product
+    </button>
+  </div>
+</div>
 
     <div class="card shadow-sm p-3 rounded-3">
       <div class="table-responsive">
         <table class="table align-middle">
           <thead>
-            <tr>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Quntity</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
+  <tr>
+    <th style="width:42px;">
+      <input class="form-check-input" type="checkbox" id="selectAll">
+    </th>
+    <th>Product</th>
+    <th>Category</th>
+    <th>Price</th>
+    <th>Quntity</th>
+    <th class="text-end">Actions</th>
+  </tr>
+</thead>
           <tbody id="productTable">
           </tbody>
         </table>
@@ -48,7 +58,7 @@
   </main>
 
 
-  <!-- Modal -->
+  <!-- Enter Data  Modal -->
   <div class="modal fade" id="productModal">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -74,7 +84,38 @@
     </div>
   </div>
 
+  <!-- Delete all modal -->
+<div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong id="bulkCount">0</strong> product(s)?
+        <div class="text-muted small mt-2">This action can’t be undone.</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmBulkDeleteBtn" class="btn btn-danger">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
  
+
+  <!-- ✅ Toast -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+    <div id="appToast" class="toast align-items-center text-white bg-dark border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="toastText">Done</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
