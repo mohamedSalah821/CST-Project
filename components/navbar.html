@@ -1,11 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3 custom-navbar">
+    <div class="container px-4 align-items-center">
+        
+        <a class="navbar-brand d-flex align-items-center fw-bold fs-4 text-dark" href="{{root}}index.html">
+            <i class="fas fa-cube text-primary me-2"></i> ShopFlow
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbarContent">
+            
+            <form class="mx-auto my-2 my-lg-0 w-100" style="max-width: 500px;">
+                <div class="input-group search-wrapper">
+                    <span class="input-group-text bg-white text-muted border-end-0 px-3">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search products...">
+                </div>
+            </form>
+
+            <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold text-dark nav-item-link" href="{{root}}pages/customer/customer-products.html">Catalog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link" href="{{root}}pages/customer/cart.html">
+                        <i class="fas fa-shopping-cart me-2 fs-5"></i> Cart
+                    </a>
+                </li>
+
+                <li class="nav-item ms-lg-2">
+                    
+                    <div id="guest-menu" class="d-flex align-items-center gap-3">
+                        <a href="{{root}}login.html" class="nav-link fw-semibold text-dark">Sign in</a>
+                        <a href="{{root}}register.html" class="btn btn-primary-custom px-4 py-2 rounded-3">Register</a>
+                    </div>
+
+                    <div id="user-menu" class="align-items-center gap-3 d-none">
+                        <a href="#" id="profile-link" class="nav-link fw-semibold text-dark d-flex align-items-center">
+                            <i class="far fa-user me-2 fs-5"></i> <span id="display-username">User</span>
+                        </a>
+                        <a href="#" id="logout-btn" class="nav-link text-danger" title="Logout">
+                            <i class="fas fa-sign-out-alt fs-5"></i>
+                        </a>
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
