@@ -3,7 +3,9 @@
     padding: 0px;
 }
 /* Layout */
-
+body{
+   background: #f5f7fa;  
+}
 
 .main-content {
     margin-left: 240px;

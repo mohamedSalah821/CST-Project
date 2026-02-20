@@ -1,6 +1,10 @@
-/* Desktop Sidebar */
-.sidebar-desktop {
-  width: 250px;
+:root { --sidebar-w: 250px; }
+
+html, body { overflow-x: hidden; }
+
+/* Desktop sidebar fixed */
+.sidebar-desktop{
+  width: var(--sidebar-w);
   height: 100vh;
   position: fixed;
   left: 0;
@@ -8,31 +12,104 @@
   background: #0f172a;
   color: #fff;
   padding: 20px;
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
-.sidebar-desktop a {
+.sidebar-desktop a{
   color: #cbd5e1;
   text-decoration: none;
   display: block;
   padding: 8px 0;
 }
-
-.sidebar-desktop a:hover {
+.sidebar-desktop a:hover{
   color: #fff;
   padding-left: 6px;
-  transition: 0.3s;
+  transition: .3s;
+}
+.sidebar-desktop h6{
+  margin-top:15px ;
 }
 
-/* Show desktop sidebar on lg+ */
-@media (min-width: 992px) {
-  .sidebar-desktop {
-    display: flex;
-  }
+/* Main content offsets on desktop only */
+.main-content{
+  min-height: 100vh;
+  background: #f5f7fa;
+}
 
-  main {
-    margin-left: 250px;
+
+@media (min-width: 992px){
+  .main-content{
+    margin-left: var(--sidebar-w);
+    width: calc(100% - var(--sidebar-w));
   }
+}
+
+@media (max-width: 991.98px){
+  .main-content{
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+
+
+/* Mobile links inside offcanvas */
+.offcanvas-start {
+  background: #0f172a;
+  color: #fff;
+  width:250px
+}
+.btn-close {
+    color: #ffffff !important;
+}
+
+.mobile-link{
+  color: #cbd5e1;
+  text-decoration: none;
+  display: block;
+  padding: 8px 0;
+}
+.mobile-link:hover{
+   color: #fff;
+  padding-left: 6px;
+  transition: .3s;
+}
+/* //////////////////// */
+
+/* ===== Custom Hamburger ===== */
+
+.custom-toggler{
+  width: 44px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding: 0 10px;
+  cursor:pointer;
+  transition: background .2s ease;
+}
+
+.custom-toggler:hover{
+  background: rgba(255,255,255,.12);
+}
+
+.custom-toggler span{
+  display:block;
+  height:2px;
+  background:#fff;
+  border-radius:999px;
+  transition: all .3s ease;
+}
+/* ///////////////////// */
+
+.mobnave{
+background-color: #0f172a !important;
+color: #fff;
+}
+.navbar-light .navbar-toggler {
+    color: rgb(255 255 255);
+    border-color: rgb(0 0 0 / 0%);
 }
