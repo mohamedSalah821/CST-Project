@@ -86,7 +86,7 @@ imageInput?.addEventListener("change", () => {
 
 function listenProducts() {
   const sellerId = getSellerId();
-  const productsRef = ref(db, `products/${sellerId}`);
+  const productsRef = ref(db, `seller-products/${sellerId}`);
 
   onValue(productsRef, (snap) => {
     cacheData = snap.val() || {};
@@ -189,7 +189,7 @@ saveBtn.addEventListener("click", async () => {
   try {
     if (!editingId) {
       // ✅ ADD
-      const newRef = push(ref(db, `products/${sellerId}`));
+      const newRef = push(ref(db, `seller-products/${sellerId}`));
 
       let imageUrl = "";
       if (file) {
@@ -221,7 +221,7 @@ saveBtn.addEventListener("click", async () => {
         updates.imageUrl = await uploadToCloudinary(file);
       }
 
-      await update(ref(db, `products/${sellerId}/${editingId}`), updates);
+      await update(ref(db, `seller-products/${sellerId}/${editingId}`), updates);
     }
 
     resetModal();
@@ -274,7 +274,7 @@ async function deleteProduct(id) {
   if (!confirm("Delete this product?")) return;
 
   try {
-    await remove(ref(db, `products/${sellerId}/${id}`));
+    await remove(ref(db, `seller-products/${sellerId}/${id}`));
 
     // ملاحظة: بما إن الصور على Cloudinary، حذف الصورة من Cloudinary
     // محتاج Backend / Function (لأسباب أمان)، فمش بنحذفها هنا.

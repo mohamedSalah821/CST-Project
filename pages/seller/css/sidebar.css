@@ -62,39 +62,31 @@ html, body { overflow-x: hidden; }
     color: #ffffff !important;
 }
 
+
+
 .mobile-link{
   color: #cbd5e1;
   text-decoration: none;
   display: block;
   padding: 8px 0;
+  transition: transform .3s ease, color .3s ease;  /* هنا */
 }
+
 .mobile-link:hover{
-   color: #fff;
-  padding-left: 6px;
-  transition: .3s;
+  color:#fff;
+  transform: translateX(6px);  /* بدل padding-left */
+}
+
+/* للموبايل (لمس) */
+.mobile-link:active,
+.mobile-link:focus{
+  color:#fff;
+  transform: translateX(6px);
 }
 /* //////////////////// */
 
 /* ===== Custom Hamburger ===== */
 
-.custom-toggler{
-  width: 44px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.06);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:6px;
-  padding: 0 10px;
-  cursor:pointer;
-  transition: background .2s ease;
-}
-
-.custom-toggler:hover{
-  background: rgba(255,255,255,.12);
-}
 
 .custom-toggler span{
   display:block;
@@ -113,3 +105,23 @@ color: #fff;
     color: rgb(255 255 255);
     border-color: rgb(0 0 0 / 0%);
 }
+
+
+.side-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  display: block;
+  padding: 8px 0;
+}
+.side-link:hover {
+   color: #fff;
+  padding-left: 6px;
+  transition: .3s;
+}
+
+
+
+/* ///////////////////// */
+
+
+
