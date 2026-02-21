@@ -14,11 +14,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
+  
 export const auth = getAuth(app);
 export const db = getDatabase(app);
-<<<<<<< HEAD
 export const storage = getStorage(app); // ✅ add
-=======
-
->>>>>>> c3645099b6b6b7d28e7e8ef9241607a110c5eb29
