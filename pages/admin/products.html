@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="./css/products.css">
+</head>
+<body>
+    
+    <div class="d-flex">
+        <button class="btn d-md-none position-fixed top-0 start-0 m-2 shadow-sm" 
+        id="sidebarToggle" style="z-index: 1100; background: #071848; color: white;">
+       <i class="bi bi-list fs-3"></i>
+       </button>
+
+ <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <i class="bi bi-speedometer2"></i>
+        <h4>Admin Panel</h4>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-link ">
+            <i class="bi bi-house-door"></i>
+            <span >Dashboard</span>
+        </a>
+        <a href="products.html" class="nav-link active">
+            <i class="bi bi-box-seam"></i>
+            <span>Products</span>
+        </a>
+        <a href="users.html" class="nav-link">
+            <i class="bi bi-people"></i>
+            <span>Users</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="admin-profile.html" class="nav-link">
+        <i class="bi bi-person-badge-fill"></i>
+        <span>My Profile</span>
+    </a>
+        <a href="../../login.html" class="nav-link logout">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content flex-grow-1">
+           <header class="page-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                <div class="mb-2 mb-md-0">
+                    <h1 class="d-flex gap-2 justify-content-md-end flex-wrap">Products Management</h1>
+                            <p class="text-muted mb-0 ms-0 ms-sm-5">Manage all products and inventory</p>
+                        </div>
+                        <div class="mt-2 mt-md-0">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="bi bi-plus-lg me-2"></i>Add Product
+                    </button>
+                </div>
+            </header>
+
+            <div class="container-fluid px-4 py-4">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-primary">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h6>Total Products</h6>
+                                <h3 id="totalProductsCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-success">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h6>Active Products</h6>
+                                <h3 id="activeProductsCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h6>Flagged Products</h6>
+                                <h3 id="flaggedProductsCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-warning">
+                                <i class="bi bi-inbox"></i>
+                            </div>
+                            <div class="stat-details">
+                                <h6>Out of Stock</h6>
+                                <h3 id="outOfStockCount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-funnel me-2"></i>
+                                            Filter Products
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex gap-2 justify-content-md-end">
+                                            <button class="btn btn-primary btn-sm active" id="filterAll" onclick="filterProducts('all')">
+                                                <i class="bi bi-grid"></i> All
+                                            </button>
+                                            <button class="btn btn-success btn-sm active" id="filterActive" onclick="filterProducts('active')">
+                                                <i class="bi bi-check-circle"></i> Active
+                                            </button>
+                                            <button class="btn btn-danger btn-sm active" id="filterFlagged" onclick="filterProducts('flagged')">
+                                                <i class="bi bi-flag"></i> Flagged
+                                            </button>
+                                            <button class="btn btn-warning btn-sm active" id="filterOutOfStock" onclick="filterProducts('outofstock')">
+                                                <i class="bi bi-inbox"></i> Out of Stock
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm col-12">
+                    <div class="card-header bg-white border-0 py-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-box-seam me-2"></i>
+                                    All Products
+                                </h5>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-0 bg-light" 
+                                           id="searchProduct" placeholder="Search by name or category...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                           <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2 text-muted">Loading products...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal fade" id="addProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProductForm">
+                        <div class="mb-3">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="productCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Clothing">Clothing</option>
+                                <option value="Books">Books</option>
+                                <option value="Home">Home</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Price ($)</label>
+                                <input type="number" class="form-control" id="productPrice" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stock</label>
+                                <input type="number" class="form-control" id="productStock" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Image URL</label>
+                            <input type="file" id="productImageFile" class="form-control" accept="image/*">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addProduct()">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script type="module" src="../../assets/js/admin-products.js"></script>
+</body>
+</html>
