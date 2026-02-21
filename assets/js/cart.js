@@ -1,4 +1,6 @@
-
+// ============================================================
+// assets/js/cart.js  —  Task 3: Cart & Transactions
+// ============================================================
 
 import { db } from "./firebase.js";
 import {
@@ -196,6 +198,7 @@ export async function placeOrder(shippingInfo) {
       name: i.name,
       price: parseFloat((i.price * i.qty).toFixed(2)),
       qty: i.qty,
+      sellerId: i.sellerId || "",
     })),
   };
 
