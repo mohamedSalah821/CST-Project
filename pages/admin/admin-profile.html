@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-body text-center">
+
+            <div class="position-relative d-inline-block">
+                <img id="profileImage"
+                     src="https://via.placeholder.com/150"
+                     class="rounded-circle border"
+                     width="150"
+                     height="150"
+                     style="object-fit: cover;">
+                
+                <label class="btn btn-sm btn-dark position-absolute bottom-0 end-0 rounded-circle">
+                    <i class="bi bi-camera"></i>
+                    <input type="file" id="imageInput" hidden>
+                </label>
+            </div>
+
+            <h4 class="mt-3" id="adminName">Loading...</h4>
+            <p class="text-muted mb-1" id="adminEmail"></p>
+            <span class="badge bg-primary">Admin</span>
+
+            <hr>
+
+            <div class="mb-3 text-start">
+                <label class="form-label">Display Name</label>
+                <input type="text" id="nameInput" class="form-control">
+            </div>
+
+            <button class="btn btn-success w-100" onclick="updateProfile()">
+                <i class="bi bi-check-circle"></i> Save Changes
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// 🔥 Firebase Config
+const firebaseConfig = {
+   apiKey: "AIzaSyAcUjMCb5t25FCqkYGBCkja8wdQHkYb8xM",
+    authDomain: "ecommerce-multi-actor.firebaseapp.com",
+    databaseURL: "https://ecommerce-multi-actor-default-rtdb.firebaseio.com",
+    projectId: "ecommerce-multi-actor",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let currentUserId = null;
+
+// ==========================
+// 📌 Load Admin Data
+// ==========================
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        alert("You must login first");
+        return;
+    }
+
+    currentUserId = user.uid;
+
+    const snapshot = await get(ref(db, `users/${user.uid}`));
+
+    if (snapshot.exists()) {
+        const data = snapshot.val();
+
+        document.getElementById('adminName').textContent = data.displayName || "Admin";
+        document.getElementById('adminEmail').textContent = data.email || user.email;
+        document.getElementById('nameInput').value = data.displayName || "";
+        document.getElementById('profileImage').src =
+            data.photoURL || "https://via.placeholder.com/150";
+    }
+});
+
+
+// ==========================
+// 🖼 Upload to Cloudinary
+// ==========================
+
+async function uploadToCloudinary(file) {
+
+    const cloudName = "dtw2jaesz";
+    const uploadPreset = "seller";
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+            method: "POST",
+            body: formData
+        }
+    );
+
+    const data = await res.json();
+    return data.secure_url;
+}
+
+document.getElementById('imageInput').addEventListener('change', async (e) => {
+
+    const file = e.target.files[0];
+    if (!file) return;
+
+    document.getElementById('profileImage').src =
+        URL.createObjectURL(file);
+
+    const imageUrl = await uploadToCloudinary(file);
+
+    await update(ref(db, `users/${currentUserId}`), {
+        photoURL: imageUrl
+    });
+});
+
+
+// ==========================
+// ✏ Update Profile
+// ==========================
+
+window.updateProfile = async function () {
+
+    const newName = document.getElementById('nameInput').value.trim();
+
+    if (!newName) {
+        alert("Name required");
+        return;
+    }
+
+    await update(ref(db, `users/${currentUserId}`), {
+        displayName: newName
+    });
+
+    document.getElementById('adminName').textContent = newName;
+
+    alert("Profile Updated Successfully");
+}
+
+</script>
+
+</body>
+</html>
