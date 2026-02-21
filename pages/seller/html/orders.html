@@ -133,12 +133,19 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    fetch("sidebar.html")
-      .then(r => r.text())
-      .then(html => document.getElementById("sidebar-container").innerHTML = html);
-  </script>
+  <script type="module">
+  fetch("sidebar.html")
+    .then(res => res.text())
+    .then(async (data) => {
+      document.getElementById("sidebar-container").innerHTML = data;
 
+      // ✅ بعد ما sidebar يتحط، حمّل سكربت الحساب
+
+      const mod = await import("./../../../assets/js/sidebar-account.js");
+      await mod.initSidebarAccount();
+    });
+</script>
   <script src="./../js/orders.js"></script>
+   
 </body>
 </html>
