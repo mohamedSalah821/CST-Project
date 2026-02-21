@@ -99,8 +99,37 @@ function bindEvents() {
       saveBtn.textContent = old;
     }
   });
-}
 
+
+    // ✅ Logout buttons (Desktop + Mobile)
+  const logoutDesktop = document.getElementById("logoutBtnDesktop");
+  const logoutMobile = document.getElementById("logoutBtnMobile");
+
+  logoutDesktop?.addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
+
+  logoutMobile?.addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
+}
+function logout() {
+  // امسحي بيانات الدخول
+  localStorage.removeItem("sellerId");
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("currentRole");
+  localStorage.removeItem("currentEmail");
+
+  // لو كنتِ خزّنتي ايميل/باسورد للسيلر قبل كده
+  localStorage.removeItem("sellerEmail");
+  localStorage.removeItem("sellerPassword");
+
+  // تحويل لصفحة اللوجين (عدلي المسار حسب مشروعك)
+  window.location.href ="../../../login.html";
+}
 export async function initSidebarAccount() {
   bindEvents();
   await loadSeller();

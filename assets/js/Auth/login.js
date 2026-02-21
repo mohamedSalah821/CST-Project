@@ -22,6 +22,25 @@ function checkLoginValidity() {
   loginBtn.disabled = !(loginEmail.classList.contains("is-valid") && loginPassword.classList.contains("is-valid"));
 }
 
+////////////////////////////
+
+// -------------------- Auto Login (لو already logged in) --------------------
+const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+if (savedUser && savedUser.role) {
+  // ✅ لو في user متخزن يبقى دخليه مباشرة
+  if (savedUser.role === "admin") {
+    window.location.href = "../../../pages/admin/users.html";
+  } else if (savedUser.role === "seller") {
+    window.location.href = "../../../pages/seller/html/seller-dashboard.html";
+  } else {
+    window.location.href = "../../../pages/customer/customer-products.html";
+  }
+}
+
+/////////////////////////////
+
+
 // email validation
 loginEmail.addEventListener("input", () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -140,8 +159,8 @@ loginForm.addEventListener("submit", async (e) => {
     }));
 
 
-    // toastr & redirect حسب role
-    toastr.success(`Welcome back, ${user.name}!`);
+    // // toastr & redirect حسب role
+    // toastr.success(`Welcome back, ${user.name}!`);
 
     localStorage.setItem("currentUser", JSON.stringify({
     name: user.name,

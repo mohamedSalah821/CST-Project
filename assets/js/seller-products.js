@@ -35,7 +35,7 @@ const priceInput = document.getElementById("price");
 const quantityInput = document.getElementById("quntity");
 const imageInput = document.getElementById("image");
 const previewImg = document.getElementById("preview");
-
+const descInput = document.getElementById("description");
 // زر الحفظ في المودال
 const saveBtn = modalEl?.querySelector(".modal-footer .btn.btn-primary");
 
@@ -170,19 +170,24 @@ function listenProducts() {
             <div>${escapeHtml(p.name ?? "")}</div>
           </div>
         </td>
-
+<td title="${escapeHtml(p.description ?? "")}">
+  ${escapeHtml((p.description ?? "").slice(0, 40))}${(p.description ?? "").length > 40 ? "..." : ""}
+</td>
         <td>${escapeHtml(p.category ?? "")}</td>
         <td>$${Number(p.price ?? 0).toFixed(2)}</td>
         <td>${Number(p.quantity ?? 0)}</td>
 
-        <td class="text-end">
-          <button class="btn btn-sm btn-outline-primary me-2" data-edit="${id}">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-          <button class="btn btn-sm btn-outline-danger" data-del="${id}">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </td>
+       <td class="text-end actions-col">
+  <div class="action-buttons">
+    <button class="btn btn-sm btn-outline-primary" data-edit="${id}">
+      <i class="fa-solid fa-pen"></i>
+    </button>
+
+    <button class="btn btn-sm btn-outline-danger" data-del="${id}">
+      <i class="fa-solid fa-trash"></i>
+    </button>
+  </div>
+</td>
       </tr>
     `).join("");
 
@@ -224,6 +229,7 @@ function resetModal() {
   if (quantityInput) quantityInput.value = "";
 
   imageInput.value = "";
+  if (descInput) descInput.value = "";
   previewImg.src = "";
   previewImg.classList.add("d-none");
 }
@@ -244,12 +250,12 @@ saveBtn?.addEventListener("click", async () => {
   const price = Number(priceInput.value);
   const quantity = Number(quantityInput?.value ?? 0);
   const file = imageInput.files?.[0];
-
+  const description = descInput?.value.trim() || ""; 
   if (!name) return alert("Enter product name");
   if (!category) return alert("Enter category");
   if (Number.isNaN(price) || price < 0) return alert("Enter valid price");
   if (!Number.isInteger(quantity) || quantity < 0) return alert("Enter valid quantity");
-
+  if (description.length > 500) return alert("Description is too long (max 500 chars)");
   const oldText = saveBtn.textContent;
   saveBtn.disabled = true;
   saveBtn.textContent = "Saving...";
@@ -267,6 +273,7 @@ saveBtn?.addEventListener("click", async () => {
         category,
         price,
         quantity,
+        description,
         imageUrl,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -278,6 +285,7 @@ saveBtn?.addEventListener("click", async () => {
         category,
         price,
         quantity,
+        description,
         updatedAt: Date.now(),
       };
 
@@ -314,7 +322,7 @@ function startEdit(id) {
   categoryInput.value = p.category ?? "";
   priceInput.value = p.price ?? 0;
   if (quantityInput) quantityInput.value = p.quantity ?? 0;
-
+  if (descInput) descInput.value = p.description ?? "";
   imageInput.value = "";
   if (p.imageUrl) {
     previewImg.src = p.imageUrl;
