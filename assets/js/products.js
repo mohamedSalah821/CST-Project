@@ -7,9 +7,9 @@
 // async function seedRichData() {
 //     console.log("جاري رفع البيانات الغنية...");
 //     try {
-//         const response = await fetch("../../data/initial-products.json"); 
+//         const response = await fetch("../../data/initial-products.json");
 //         const json = await response.json();
-        
+
 //         let updates = {};
 //         json.data.forEach(item => {
 //             updates[item._id] = {
@@ -21,7 +21,7 @@
 //                 brand: item.brand ? item.brand.name : "Generic", // اسم الماركة
 //                 imageUrl: item.imageCover, // الصورة الرئيسية
 //                 gallery: item.images || [], // معرض الصور (Array)
-//                 quantity: item.quantity || 100, 
+//                 quantity: item.quantity || 100,
 //                 rating: item.ratingsAverage || 4.5,
 //                 ratingsCount: item.ratingsQuantity || 0, // عدد التقييمات
 //                 sold: item.sold || 0, // عدد المبيعات
@@ -38,37 +38,52 @@
 // }
 // document.addEventListener("DOMContentLoaded", seedRichData);
 
-
 // assets/js/products.js
 
 import { db } from "./firebase.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import {
+  ref,
+  onValue,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { addToCart, showToast } from "./cart.js";
+
+// addToCartById looks up the full product from allProducts by id
+// then calls addToCart(product) from cart.js — no Firebase fetch needed
+window.addToCartById = function (productId) {
+  const product = allProducts.find((p) => p.id === productId);
+  if (product) addToCart(product);
+};
 
 let allProducts = [];
 
 // ==========================================
-// 1. Slide Show with truly sale value  
+// 1. Slide Show with truly sale value
 
 function renderCarousel(productsList) {
-    const carouselInner = document.getElementById("carouselInner");
-    const carouselElement = document.getElementById("saleCarousel");
-    
-    const saleProducts = productsList.filter(p => p.priceAfterDiscount && p.priceAfterDiscount < p.price).slice(0, 5);
-    
-    if (saleProducts.length === 0) {
-        carouselElement.classList.add("d-none"); 
-        return;
-    }
-    
-    carouselElement.classList.remove("d-none"); 
-    
-    let html = "";
-    saleProducts.forEach((p, index) => {
-        const activeClass = index === 0 ? "active" : "";
-        const discount = Math.round(((p.price - p.priceAfterDiscount) / p.price) * 100);
-        const img = p.imageUrl || "https://via.placeholder.com/300x300?text=No+Image";
-        
-        html += `
+  const carouselInner = document.getElementById("carouselInner");
+  const carouselElement = document.getElementById("saleCarousel");
+
+  const saleProducts = productsList
+    .filter((p) => p.priceAfterDiscount && p.priceAfterDiscount < p.price)
+    .slice(0, 5);
+
+  if (saleProducts.length === 0) {
+    carouselElement.classList.add("d-none");
+    return;
+  }
+
+  carouselElement.classList.remove("d-none");
+
+  let html = "";
+  saleProducts.forEach((p, index) => {
+    const activeClass = index === 0 ? "active" : "";
+    const discount = Math.round(
+      ((p.price - p.priceAfterDiscount) / p.price) * 100,
+    );
+    const img =
+      p.imageUrl || "https://via.placeholder.com/300x300?text=No+Image";
+
+    html += `
         <div class="carousel-item ${activeClass}" data-bs-interval="3000">
             <div class="row align-items-center carousel-item-content">
                 <div class="col-md-6 text-white mb-4 mb-md-0">
@@ -87,9 +102,9 @@ function renderCarousel(productsList) {
                 </div>
             </div>
         </div>`;
-    });
-    
-    carouselInner.innerHTML = html;
+  });
+
+  carouselInner.innerHTML = html;
 }
 
 // ==========================================
@@ -99,8 +114,8 @@ function displayProducts(productsList) {
   const container = document.getElementById("productsContainer");
   const productCountSpan = document.getElementById("productCount");
 
-  container.innerHTML = ""; 
-  productCountSpan.textContent = productsList.length; 
+  container.innerHTML = "";
+  productCountSpan.textContent = productsList.length;
 
   if (!productsList || productsList.length === 0) {
     container.innerHTML = `<div class="col-12 text-center py-5"><h3>No products found!</h3></div>`;
@@ -108,18 +123,26 @@ function displayProducts(productsList) {
   }
 
   productsList.forEach((product) => {
-    const shortTitle = product.name && product.name.length > 25 ? product.name.substring(0, 25) + "..." : (product.name || "Unnamed Product");
-    const shortDesc = product.description && product.description.length > 50 ? product.description.substring(0, 50) + "..." : "High quality product from our trusted sellers.";
-    
+    const shortTitle =
+      product.name && product.name.length > 25
+        ? product.name.substring(0, 25) + "..."
+        : product.name || "Unnamed Product";
+    const shortDesc =
+      product.description && product.description.length > 50
+        ? product.description.substring(0, 50) + "..."
+        : "High quality product from our trusted sellers.";
+
     const originalPrice = parseFloat(product.price || 0);
     const discountedPrice = parseFloat(product.priceAfterDiscount || 0);
-    
+
     let priceHtml = "";
     let discountPercentHtml = "";
     let badgeHtml = "";
 
     if (discountedPrice > 0 && discountedPrice < originalPrice) {
-      const discountPercentage = Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
+      const discountPercentage = Math.round(
+        ((originalPrice - discountedPrice) / originalPrice) * 100,
+      );
       priceHtml = `
         <span class="old-price">$${originalPrice.toFixed(2)}</span>
         <span class="h5 fw-bold text-dark mb-0">$${discountedPrice.toFixed(2)}</span>
@@ -129,7 +152,7 @@ function displayProducts(productsList) {
     } else {
       priceHtml = `<span class="h5 fw-bold text-dark mb-0">$${originalPrice.toFixed(2)}</span>`;
       if (product.sellerId !== "system_initial") {
-          badgeHtml = `<span class="badge-new">New</span>`;
+        badgeHtml = `<span class="badge-new">New</span>`;
       }
     }
 
@@ -173,7 +196,7 @@ function displayProducts(productsList) {
                             </div>
                         </div>
                         
-                        <button onclick="window.addToCart('${product.id}')" class="btn btn-add-cart rounded-3 px-3 py-2" title="Add to Cart">
+                        <button onclick="window.addToCartById('${product.id}')" class="btn btn-add-cart rounded-3 px-3 py-2" title="Add to Cart">
                             <i class="fa fa-shopping-cart"></i>
                         </button>
                     </div>
@@ -181,7 +204,7 @@ function displayProducts(productsList) {
             </div>
         </div>
     `;
-    container.innerHTML += card; 
+    container.innerHTML += card;
   });
 }
 
@@ -191,34 +214,52 @@ function renderCategories() {
   const filterContainer = document.getElementById("categoryFilters");
   if (!filterContainer) return;
 
-  const uniqueCategories = [...new Set(allProducts.map(p => p.category))].filter(Boolean);
+  const uniqueCategories = [
+    ...new Set(allProducts.map((p) => p.category)),
+  ].filter(Boolean);
 
   let html = `<button class="btn btn-outline-secondary px-3 py-1 fs-6 active" data-category="all">All</button>`;
 
-  uniqueCategories.forEach(category => {
+  uniqueCategories.forEach((category) => {
     html += `<button class="btn btn-outline-secondary px-3 py-1 fs-6" data-category="${category.toLowerCase()}">${category}</button>`;
   });
 
   filterContainer.innerHTML = html;
-  setupFilters(); 
+  setupFilters();
 }
 
 function filterProducts() {
   const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-  const activeCategoryBtn = document.querySelector("#categoryFilters .btn.active");
-  const selectedCategory = activeCategoryBtn ? activeCategoryBtn.getAttribute("data-category") : "all";
+  const activeCategoryBtn = document.querySelector(
+    "#categoryFilters .btn.active",
+  );
+  const selectedCategory = activeCategoryBtn
+    ? activeCategoryBtn.getAttribute("data-category")
+    : "all";
   const sortValue = document.querySelector("select.form-select").value;
 
   let filtered = allProducts.filter((product) => {
-    const searchMatch = (product.name || "").toLowerCase().includes(searchTerm) || (product.description || "").toLowerCase().includes(searchTerm);
-    const categoryMatch = selectedCategory === "all" || (product.category || "").toLowerCase() === selectedCategory;
+    const searchMatch =
+      (product.name || "").toLowerCase().includes(searchTerm) ||
+      (product.description || "").toLowerCase().includes(searchTerm);
+    const categoryMatch =
+      selectedCategory === "all" ||
+      (product.category || "").toLowerCase() === selectedCategory;
     return searchMatch && categoryMatch;
   });
 
   if (sortValue === "price-asc") {
-    filtered.sort((a, b) => (a.priceAfterDiscount || a.price || 0) - (b.priceAfterDiscount || b.price || 0)); 
+    filtered.sort(
+      (a, b) =>
+        (a.priceAfterDiscount || a.price || 0) -
+        (b.priceAfterDiscount || b.price || 0),
+    );
   } else if (sortValue === "price-desc") {
-    filtered.sort((a, b) => (b.priceAfterDiscount || b.price || 0) - (a.priceAfterDiscount || a.price || 0));
+    filtered.sort(
+      (a, b) =>
+        (b.priceAfterDiscount || b.price || 0) -
+        (a.priceAfterDiscount || a.price || 0),
+    );
   }
 
   displayProducts(filtered);
@@ -238,11 +279,16 @@ function setupFilters() {
   newSortSelect.addEventListener("change", filterProducts);
 
   const newCategoryContainer = categoryContainer.cloneNode(true);
-  categoryContainer.parentNode.replaceChild(newCategoryContainer, categoryContainer);
-  
+  categoryContainer.parentNode.replaceChild(
+    newCategoryContainer,
+    categoryContainer,
+  );
+
   newCategoryContainer.addEventListener("click", (e) => {
     if (e.target.tagName === "BUTTON") {
-      newCategoryContainer.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
+      newCategoryContainer
+        .querySelectorAll("button")
+        .forEach((b) => b.classList.remove("active"));
       e.target.classList.add("active");
       filterProducts();
     }
@@ -253,52 +299,50 @@ function setupFilters() {
 // 4. getting data from firebase and initialize the page
 
 function loadProductsFromFirebase() {
-  const productsRef = ref(db, 'seller-products');
-  
-  onValue(productsRef, (snapshot) => {
-    allProducts = []; 
-    
-    if (snapshot.exists()) {
-      const fbData = snapshot.val();
-      
-      for (const sellerId in fbData) {
-        const sellerProducts = fbData[sellerId];
-        for (const productId in sellerProducts) {
-          const p = sellerProducts[productId];
-          allProducts.push({
-            id: productId,
-            sellerId: sellerId,
-            name: p.name,
-            description: p.description, 
-            price: p.price,
-            priceAfterDiscount: p.priceAfterDiscount,
-            category: p.category,
-            imageUrl: p.imageUrl,
-            quantity: p.quantity,
-            rating: p.rating 
-          });
+  const productsRef = ref(db, "seller-products");
+
+  onValue(
+    productsRef,
+    (snapshot) => {
+      allProducts = [];
+
+      if (snapshot.exists()) {
+        const fbData = snapshot.val();
+
+        for (const sellerId in fbData) {
+          const sellerProducts = fbData[sellerId];
+          for (const productId in sellerProducts) {
+            const p = sellerProducts[productId];
+            allProducts.push({
+              id: productId,
+              sellerId: sellerId,
+              name: p.name,
+              description: p.description,
+              price: p.price,
+              priceAfterDiscount: p.priceAfterDiscount,
+              category: p.category,
+              imageUrl: p.imageUrl,
+              quantity: p.quantity,
+              rating: p.rating,
+            });
+          }
         }
+
+        renderCategories();
+        renderCarousel(allProducts);
+        displayProducts(allProducts);
+      } else {
+        document.getElementById("productsContainer").innerHTML =
+          `<div class="col-12 text-center py-5"><h3>No products found!</h3></div>`;
+        document.getElementById("saleCarousel").classList.add("d-none");
       }
-      
-      renderCategories(); 
-      renderCarousel(allProducts); 
-      displayProducts(allProducts);
-    } else {
-      document.getElementById("productsContainer").innerHTML = `<div class="col-12 text-center py-5"><h3>No products found!</h3></div>`;
-      document.getElementById("saleCarousel").classList.add("d-none");
-    }
-  }, (error) => {
-    console.error("Firebase read error:", error);
-  });
+    },
+    (error) => {
+      console.error("Firebase read error:", error);
+    },
+  );
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadProductsFromFirebase();
+  loadProductsFromFirebase();
 });
-
-// ==========================================
-// 5. Add to Cart
-window.addToCart = function(productId) {
-    console.log("Adding product to cart:", productId);
-    alert("Product " + productId + " clicked! Cart logic coming soon.");
-};

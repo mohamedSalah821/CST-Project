@@ -5,6 +5,7 @@ import {
   ref,
   get,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { addToCart } from "./cart.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get("id");
@@ -12,6 +13,8 @@ const sellerId = urlParams.get("seller");
 
 const container = document.getElementById("productDetailsContainer");
 const breadcrumb = document.getElementById("breadcrumb");
+
+let currentProduct = null; // stores the loaded product for addToCart use
 
 // 1. دالة لجلب تفاصيل المنتج
 async function loadProductDetails() {
@@ -26,6 +29,7 @@ async function loadProductDetails() {
 
     if (snapshot.exists()) {
       const product = snapshot.val();
+      currentProduct = { id: productId, sellerId, ...product }; // save for cart use
       renderProduct(product, productId);
     } else {
       container.innerHTML = `<div class="alert alert-warning text-center">Product not found. It may have been removed.</div>`;
@@ -46,7 +50,7 @@ function renderProduct(p, pId) {
     `;
 
   // price and discount logic
-    const originalPrice = parseFloat(p.price || 0);
+  const originalPrice = parseFloat(p.price || 0);
   let discountedPrice = p.priceAfterDiscount
     ? parseFloat(p.priceAfterDiscount)
     : null;
@@ -91,7 +95,7 @@ function renderProduct(p, pId) {
       ? p.description
       : "No description available for this product at the moment.";
 
-      // reviews
+  // reviews
   let reviewsHtml = "";
   if (p.reviews && Array.isArray(p.reviews) && p.reviews.length > 0) {
     // if the seller has reviews and it's an array with at least one review
@@ -150,7 +154,7 @@ function renderProduct(p, pId) {
                 </div>
 
                 <div class="mt-5 d-flex gap-3">
-                    <button class="btn btn-add-huge flex-grow-1" onclick="window.addToCartFromDetails('${pId}')">
+                    <button class="btn btn-add-huge flex-grow-1" onclick="window.addToCartFromDetails()">
                         <i class="fas fa-cart-plus me-2"></i> Add to Cart
                     </button>
                     <button class="btn btn-outline-danger px-4 rounded-3" title="Add to Wishlist">
@@ -194,10 +198,31 @@ window.updateQty = function (change) {
   }
 };
 
-window.addToCartFromDetails = function (productId) {
+window.addToCartFromDetails = function () {
   const qty = parseInt(document.getElementById("qtyInput").value);
-  console.log(`Adding ${qty} of product ${productId} to cart`);
-  alert(`Successfully added ${qty} item(s) to your cart!`);
+
+  if (!currentProduct) return;
+
+  // If not logged in, redirect to login
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  if (!user) {
+    window.location.href = "../../login.html";
+    return;
+  }
+
+  // Call the real addToCart from cart.js
+  addToCart(currentProduct, qty);
+
+  // Show success modal (window.bootstrap works across module boundary)
+  const msgEl = document.getElementById("modal-cart-msg");
+  if (msgEl)
+    msgEl.textContent =
+      qty + ' x "' + currentProduct.name + '" added to your cart.';
+  const modalEl = document.getElementById("addToCartModal");
+  if (modalEl && window.bootstrap) {
+    const modal = new window.bootstrap.Modal(modalEl);
+    modal.show();
+  }
 };
 
 document.addEventListener("DOMContentLoaded", loadProductDetails);
