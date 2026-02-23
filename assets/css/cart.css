@@ -375,7 +375,7 @@ body {
 /* ── Toast ───────────────────────────────────────────────── */
 .cart-toast {
   position: fixed;
-  bottom: 28px;
+  top: 28px;
   right: 28px;
   background: #fff;
   border: 1px solid var(--border-color);
@@ -387,7 +387,7 @@ body {
   color: var(--dark-navy);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(-12px);
   transition:
     opacity 0.3s ease,
     transform 0.3s ease;
@@ -419,7 +419,7 @@ body {
   .cart-toast {
     left: 12px;
     right: 12px;
-    bottom: 16px;
+    top: 16px;
   }
 }
 
