@@ -156,7 +156,27 @@ form.addEventListener("submit", async (e) => {
 
     if (response.ok) {
       toastr.success("Account created successfully🤩");
-      
+       
+//////////////////////////
+ // ✅ لو عايزة بس السيلر يتعمله auto login بعد الريجيستر
+if (userData.role === "seller") {
+  localStorage.setItem("sellerEmail", userData.email);
+  localStorage.setItem("sellerPassword", userData.password);
+
+  // ✅ flag ان السيلر logged in
+  localStorage.setItem("isLoggedIn", "true");
+  localStorage.setItem("currentRole", "seller");
+   // ✅ التوجيه حسب نوع الحساب
+  setTimeout(() => {
+    if (userData.role === "seller") {
+      window.location.href = "./seller-dashboard.html";
+    } else {
+      window.location.href = "./login.html";
+    }
+  }, 1500);
+}
+/////////////////////////
+
       form.reset();
       [nameInput, emailInput, passwordInput, confirmPasswordInput].forEach(input => {
         input.classList.remove("is-valid");

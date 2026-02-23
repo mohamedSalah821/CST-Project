@@ -11,7 +11,22 @@
 
   <link rel="stylesheet" href="./../css/sidebar.css">
   <link rel="stylesheet" href="./../css/products.css">
+<style>
+  /* يخليهم دايمًا جنب بعض */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap; /* يمنع النزول تحت بعض */
+}
 
+/* يصغر الأزرار في الموبايل */
+@media (max-width: 576px) {
+  .action-buttons .btn {
+    padding: 4px 6px;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -43,9 +58,11 @@
       <input class="form-check-input" type="checkbox" id="selectAll">
     </th>
     <th>Product</th>
+    <th>Description</th>
     <th>Category</th>
     <th>Price</th>
     <th>Quntity</th>
+
     <th class="text-end">Actions</th>
   </tr>
 </thead>
@@ -72,6 +89,7 @@
           <input type="text" id="category" class="form-control mb-2" placeholder="Category">
           <input type="number" id="price" class="form-control mb-2" placeholder="Price">
            <input type="number" id="quntity" class="form-control mb-2" placeholder="Quntity">
+           <textarea id="description" class="form-control mb-2" rows="3" placeholder="Description"></textarea>
           <input type="file" id="image" class="form-control mb-2" accept="image/*">
           <img id="preview" class="w-100 rounded d-none" style="max-height:200px; object-fit:cover;">
 
