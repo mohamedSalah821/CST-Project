@@ -170,9 +170,9 @@ loginForm.addEventListener("submit", async (e) => {
 
     setTimeout(() => {
       if (user.role === "admin") {
-        window.location.href = "../../../pages/admin/users.html";
+        window.location.href = "../../../pages/admin/dashboard.html";
       } else if (user.role === "seller") {
-        window.location.href = "../../../pages/seller/html/seller-dashboard.html";
+        window.location.href = "../../../../pages/seller/html/seller-dashboard.html";
       } else {
         window.location.href = "../../../pages/customer/customer-products.html";
       }
