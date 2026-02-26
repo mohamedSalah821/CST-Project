@@ -6,6 +6,7 @@ import {
   get,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { addToCart } from "./cart.js";
+import { toggleWishHeart, isInWishlist } from "./wishlist.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get("id");
@@ -31,6 +32,16 @@ async function loadProductDetails() {
       const product = snapshot.val();
       currentProduct = { id: productId, sellerId, ...product }; // save for cart use
       renderProduct(product, productId);
+      // Check if already wishlisted
+      isInWishlist(productId).then((already) => {
+        if (already) {
+          const btn = document.getElementById("detail-wish-btn");
+          if (btn) {
+            btn.classList.add("wishlisted");
+            btn.querySelector("i").className = "fa-solid fa-heart fs-4";
+          }
+        }
+      });
     } else {
       container.innerHTML = `<div class="alert alert-warning text-center">Product not found. It may have been removed.</div>`;
     }
@@ -157,8 +168,8 @@ function renderProduct(p, pId) {
                     <button class="btn btn-add-huge flex-grow-1" onclick="window.addToCartFromDetails()">
                         <i class="fas fa-cart-plus me-2"></i> Add to Cart
                     </button>
-                    <button class="btn btn-outline-danger px-4 rounded-3" title="Add to Wishlist">
-                        <i class="far fa-heart fs-4"></i>
+                    <button id="detail-wish-btn" class="wish-btn btn btn-outline-danger px-4 rounded-3" data-pid="${pId}" onclick="window.toggleWishHeart(this,'${pId}')" title="Add to Wishlist">
+                        <i class="fa-regular fa-heart fs-4"></i>
                     </button>
                 </div>
             </div>

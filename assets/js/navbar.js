@@ -25,6 +25,7 @@ function loadNavbar(rootPath = "") {
 
       // 3. تفعيل لون الصفحة الحالية (Active Link)
       highlightActiveLink();
+      setupWishlistNavGuard(rootPath);
     })
     .catch((error) => console.error("Error loading the navbar:", error));
 }
@@ -94,6 +95,21 @@ function highlightActiveLink() {
       link.classList.add("active");
     } else {
       link.classList.remove("active");
+    }
+  });
+}
+
+// ── Wishlist nav guard (added for wishlist feature) ───────────────
+// Called inside loadNavbar after navbar HTML is injected
+function setupWishlistNavGuard(rootPath) {
+  const link = document.getElementById("wishlist-nav-link");
+  if (!link) return;
+  link.addEventListener("click", function (e) {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const uid  = localStorage.getItem("sellerId");
+    if (!user || !uid) {
+      e.preventDefault();
+      window.location.href = rootPath + "login.html";
     }
   });
 }
