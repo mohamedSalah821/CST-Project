@@ -17,10 +17,9 @@
 <body>
     
     <div class="d-flex">
-       <button class="btn d-md-none position-fixed top-0 start-0 m-2 shadow-sm" 
-        id="sidebarToggle" style="z-index: 1100; background: #071848; color: white;">
-       <i class="bi bi-list fs-3"></i>
-       </button>
+       <button class="sidebar-toggle d-md-none" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
 
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -40,6 +39,9 @@
         <a href="users.html" class="nav-link active">
             <i class="bi bi-people"></i>
             <span>Users</span>
+             <a class="nav-link " href="./customer service.html">
+                    <i class="bi bi-chat-dots"></i> Customer Service
+                </a>
         </a>
     </nav>
 
@@ -132,20 +134,45 @@
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-0">
-                                        <i class="bi bi-search"></i>
                                     </span>
                                     <input type="text" class="form-control border-0 bg-light" 
-                                           id="searchUser" placeholder="Search by email or name...">
+                                           id="searchUser" placeholder="🔍Search by email or name...">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
+                            <!-- Bulk Actions Bar -->
+                                    <div id="bulkActionsBar" style="display:none; position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 2px solid #dee2e6; padding: 15px; margin-bottom: 15px;" class="d-flex align-items-center justify-content-between shadow-sm">
+                                        <div>
+                                            <strong><span id="selectedCount">0</span> USER SELECTED</strong>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button onclick="bulkBlockUsers()" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-slash-circle me-1"></i>Block Selected
+                                            </button>
+                                            <button onclick="bulkUnblockUsers()" class="btn btn-outline-success btn-sm">
+                                                <i class="bi bi-unlock me-1"></i>Unblock Selected
+                                            </button>
+                                            <button onclick="bulkResetPassword()" class="btn btn-primary btn-sm">
+                                                <i class="bi bi-key me-1"></i>Reset Password
+                                            </button>
+                                            <button onclick="bulkDeleteUsers()" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash me-1"></i>Delete Selected
+                                            </button>
+                                        </div>
+                                    </div>
                             <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
-                                        <th>User</th>
+                                        <th>
+                                            <input type="checkbox" 
+                                                class="form-check-input" 
+                                                id="selectAllCheckbox"
+                                                onchange="selectAllUsers()">
+                                        </th>
+                                        <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
                                         <th>Status</th>

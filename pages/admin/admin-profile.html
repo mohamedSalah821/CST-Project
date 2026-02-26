@@ -1,160 +1,140 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Admin Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --main-gradient: linear-gradient(135deg, #4d5162 0%, #92879d 100%);
+        }
+        body {
+            background: #f4f7fe;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .profile-container { max-width: 850px; margin: 40px auto; padding: 0 20px; }
+        .profile-card {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: none;
+            overflow: hidden;
+        }
+        .profile-header {
+            background: var(--main-gradient);
+            padding: 50px 30px;
+            text-align: center;
+            color: white;
+        }
+        .profile-img-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .profile-img {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255,255,255,0.2);
+            transition: 0.3s;
+        }
+        .upload-btn {
+            position: absolute; bottom: 5px; right: 5px;
+            width: 38px; height: 38px;
+            background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #667eea; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .profile-body { padding: 40px; }
+        .section-title {
+            font-size: 1.1rem; font-weight: 700; color: #4a5568;
+            margin-bottom: 25px; display: flex; align-items: center;
+            border-right: 4px solid #764ba2; padding-right: 15px;
+        }
+        .form-control {
+            border-radius: 12px; padding: 12px 18px;
+            border: 1.5px solid #e2e8f0; background: #f8fafc;
+        }
+        .form-control:focus {
+            background: white; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        }
+        .btn-save {
+            background: var(--main-gradient); border: none;
+            padding: 14px 50px; border-radius: 12px;
+            font-weight: 600; color: white; transition: 0.3s;
+        }
+        .btn-save:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(118,75,162,0.3); }
+        .loading-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.8);
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .readonly-box {
+            background: #edf2f7; border-radius: 12px; padding: 12px 18px; color: #718096;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-5">
-    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-        <div class="card-body text-center">
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-grow text-primary" role="status"></div>
+</div>
 
-            <div class="position-relative d-inline-block">
-                <img id="profileImage"
-                     src="https://via.placeholder.com/150"
-                     class="rounded-circle border"
-                     width="150"
-                     height="150"
-                     style="object-fit: cover;">
-                
-                <label class="btn btn-sm btn-dark position-absolute bottom-0 end-0 rounded-circle">
-                    <i class="bi bi-camera"></i>
-                    <input type="file" id="imageInput" hidden>
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-img-wrapper">
+                <img id="profileDisplay" src="https://via.placeholder.com/150" class="profile-img">
+                <label for="uploadImg" class="upload-btn">
+                    <i class="bi bi-camera-fill"></i>
                 </label>
+                <input type="file" id="uploadImg" hidden accept="image/*">
             </div>
-
-            <h4 class="mt-3" id="adminName">Loading...</h4>
-            <p class="text-muted mb-1" id="adminEmail"></p>
-            <span class="badge bg-primary">Admin</span>
-
-            <hr>
-
-            <div class="mb-3 text-start">
-                <label class="form-label">Display Name</label>
-                <input type="text" id="nameInput" class="form-control">
-            </div>
-
-            <button class="btn btn-success w-100" onclick="updateProfile()">
-                <i class="bi bi-check-circle"></i> Save Changes
+            <h1 class="profile-name h3 mb-1" id="adminNameDisplay">Loading...</h1>
+            <p class="opacity-75 mb-3"> System Administrator</p>
+            <div id="uploadStatus"></div>
+            <button class="btn btn-light btn-sm rounded-pill px-4" onclick="window.history.back()">
+                <i class="bi bi-arrow-right ms-2"></i>Back to Dashboard
             </button>
+        </div>
 
+        <div class="profile-body">
+            <form id="profileForm">
+                <div class="section-title">Account information</div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted">  email </label>
+                    <div class="readonly-box" id="adminEmail">loading...</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted" for="adminName"> full name</label>
+                    <input type="text" id="adminName" class="form-control" placeholder=" Enter your full name">
+                </div>
+
+                <div class="section-title mt-5">  change password</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold text-muted">currentPassword</label>
+                        <input type="password" id="currentPassword" class="form-control" placeholder="********">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold text-muted"> newPassword </label>
+                        <input type="password" id="newPassword" class="form-control" placeholder="Leave blank to keep current password">
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <button type="submit" class="btn btn-save">
+                        <i class="bi bi-shield-check me-2"></i> sasve changes
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-// 🔥 Firebase Config
-const firebaseConfig = {
-   apiKey: "AIzaSyAcUjMCb5t25FCqkYGBCkja8wdQHkYb8xM",
-    authDomain: "ecommerce-multi-actor.firebaseapp.com",
-    databaseURL: "https://ecommerce-multi-actor-default-rtdb.firebaseio.com",
-    projectId: "ecommerce-multi-actor",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-let currentUserId = null;
-
-// ==========================
-// 📌 Load Admin Data
-// ==========================
-
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        alert("You must login first");
-        return;
-    }
-
-    currentUserId = user.uid;
-
-    const snapshot = await get(ref(db, `users/${user.uid}`));
-
-    if (snapshot.exists()) {
-        const data = snapshot.val();
-
-        document.getElementById('adminName').textContent = data.displayName || "Admin";
-        document.getElementById('adminEmail').textContent = data.email || user.email;
-        document.getElementById('nameInput').value = data.displayName || "";
-        document.getElementById('profileImage').src =
-            data.photoURL || "https://via.placeholder.com/150";
-    }
-});
-
-
-// ==========================
-// 🖼 Upload to Cloudinary
-// ==========================
-
-async function uploadToCloudinary(file) {
-
-    const cloudName = "dtw2jaesz";
-    const uploadPreset = "seller";
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-
-    const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-            method: "POST",
-            body: formData
-        }
-    );
-
-    const data = await res.json();
-    return data.secure_url;
-}
-
-document.getElementById('imageInput').addEventListener('change', async (e) => {
-
-    const file = e.target.files[0];
-    if (!file) return;
-
-    document.getElementById('profileImage').src =
-        URL.createObjectURL(file);
-
-    const imageUrl = await uploadToCloudinary(file);
-
-    await update(ref(db, `users/${currentUserId}`), {
-        photoURL: imageUrl
-    });
-});
-
-
-// ==========================
-// ✏ Update Profile
-// ==========================
-
-window.updateProfile = async function () {
-
-    const newName = document.getElementById('nameInput').value.trim();
-
-    if (!newName) {
-        alert("Name required");
-        return;
-    }
-
-    await update(ref(db, `users/${currentUserId}`), {
-        displayName: newName
-    });
-
-    document.getElementById('adminName').textContent = newName;
-
-    alert("Profile Updated Successfully");
-}
-
-</script>
-
+<script type="module" src="../../assets/js/admin-profile.js"></script>
 </body>
 </html>
