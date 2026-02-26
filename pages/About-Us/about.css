@@ -1,0 +1,110 @@
+
+    .Top
+    {
+        background-image: url(../../assets/images/About\ us\ page.gif);
+        background-size: cover;
+        background-position: 50%;
+        background-repeat: no-repeat;
+        padding: 120px 0;
+    }
+    .Top a, a:hover, button {
+    text-decoration: none;
+    }
+
+    .overlay
+    {
+        z-index: 2;
+        position: relative;
+    }
+
+    .overlay::before
+    {
+        position: absolute;
+        content: "";
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background:#1A76D1;
+        opacity: .8;
+        z-index: -10;
+    }
+
+    .Top h2 {
+        color: #fff;
+        text-transform: capitalize;
+        font-size: 38px;
+        font-weight: 700;
+        margin: 0;
+        padding: 0;
+    }
+
+    .Top .list {
+        display: inline-block;
+        margin-top: 20px;
+    }
+    .Top ul li {
+        display: inline-block;
+        position: relative;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    .Top ul li a {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 500;
+        text-transform: capitalize;
+        margin: 0;
+        padding: 0;
+    }
+    .Top ul li a:hover {
+        color: #2c2d3f;
+    }
+
+
+    .about-site h3 {
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.about-site p {
+  color: #555;
+  line-height: 1.6;
+}
+
+.about-site .card i {
+  color: #1A76D1;
+}
+
+.about-site .card:hover {
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+#testimonialCarousel {
+  max-width: 600px;
+  margin: auto;
+}
+#testimonialCarousel p{
+    margin-bottom: 40px !important;
+}
+#testimonialCarousel img {
+  border: 4px solid #0d6efd;
+}
+.carousel-inner {
+  padding: 20px 0;
+}
+.carousel-indicators [data-bs-target] {
+  background-color: #0d6efd !important;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-size: 100%, 100%;
+}
+
+
+.shadow-card{
+  box-shadow: 0px 10px 20px  rgba(54, 148, 241, 0.1);
+}
