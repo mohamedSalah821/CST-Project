@@ -1,0 +1,259 @@
+
+.wish-btn {
+  background: #fff;
+  border: 1.5px solid #dee2e6;
+  color: #adb5bd;
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
+}
+.wish-btn:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+  transform: scale(1.1);
+}
+.wish-btn.wishlisted {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+.wish-btn.wishlisted i {
+  animation: heartPop 0.3s ease;
+}
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.5);
+  }
+  80% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ── Wishlist toast ──────────────────────────────────────────── */
+.wish-toast {
+  position: fixed;
+  top: 28px;
+  right: 28px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-left: 4px solid #007bff;
+  border-radius: 10px;
+  padding: 0.85rem 1.3rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  z-index: 99999;
+}
+.wish-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (max-width: 768px) {
+  .wish-toast {
+    left: 12px;
+    right: 12px;
+    top: 16px;
+  }
+}
+
+.wish-nav-badge {
+  display: none;
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #007bff;
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+}
+
+.wl-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #007bff 100%);
+  color: #fff;
+  padding: 2.5rem 0;
+}
+.wl-header-icon {
+  width: 58px;
+  height: 58px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.wl-empty-icon {
+  width: 110px;
+  height: 110px;
+  background: #e7f1ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  color: #007bff;
+  margin: 0 auto 1.5rem;
+}
+
+.wl-card {
+  background: #fff;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.wl-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.wl-card-img-wrap {
+  position: relative;
+  height: 220px;
+  background: #fff;
+  border-bottom: 1px solid #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.wl-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.wl-card:hover .wl-card-img-wrap img {
+  transform: scale(1.05);
+}
+
+
+.wl-remove-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  color: #dc3545;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+  z-index: 2;
+}
+.wl-remove-btn:hover {
+  background: #dc3545;
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* ── Card body ───────────────────────────────────────────────── */
+.wl-card-body {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.wl-card-cat {
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.wl-card-name {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0;
+  line-height: 1.4;
+  text-decoration: none;
+  display: block;
+}
+.wl-card-name:hover {
+  color: #007bff;
+}
+
+/* ── Prices ──────────────────────────────────────────────────── */
+.wl-price-new {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+.wl-price-old {
+  font-size: 0.85rem;
+  color: #adb5bd;
+  text-decoration: line-through;
+}
+
+/* ── Add to cart button ──────────────────────────────────────── */
+.btn-wl-cart {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+  margin-top: auto;
+}
+.btn-wl-cart:hover:not(:disabled) {
+  background-color: #0056b3;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.btn-wl-cart:disabled {
+  background-color: #dee2e6;
+  color: #adb5bd;
+  cursor: not-allowed;
+}

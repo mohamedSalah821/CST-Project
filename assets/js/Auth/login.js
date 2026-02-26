@@ -22,6 +22,25 @@ function checkLoginValidity() {
   loginBtn.disabled = !(loginEmail.classList.contains("is-valid") && loginPassword.classList.contains("is-valid"));
 }
 
+////////////////////////////
+
+// -------------------- Auto Login (لو already logged in) --------------------
+const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+if (savedUser && savedUser.role) {
+  // ✅ لو في user متخزن يبقى دخليه مباشرة
+  if (savedUser.role === "admin") {
+    window.location.href = "../../../pages/admin/users.html";
+  } else if (savedUser.role === "seller") {
+    window.location.href = "../../../pages/seller/html/seller-dashboard.html";
+  } else {
+    window.location.href = "../../../pages/customer/customer-products.html";
+  }
+}
+
+/////////////////////////////
+
+
 // email validation
 loginEmail.addEventListener("input", () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,19 +111,56 @@ loginForm.addEventListener("submit", async (e) => {
       return;
     }
 
-    // البحث عن اليوزر
-    const user = Object.values(users).find(u => u.email === loginEmail.value.trim() && u.password === loginPassword.value);
+    // // البحث عن اليوزر
+    // const user = Object.values(users).find(u => u.email === loginEmail.value.trim() && u.password === loginPassword.value);
 
-    if (!user) {
+    // if (!user) {
+    //   toastr.warning("Invalid email or password");
+    //   btnText.classList.remove("d-none");
+    // btnLoader.classList.add("d-none");
+    // loginBtn.disabled = false;
+    //   return;
+    // }
+
+    /* =========================================================
+       ✅✅✅ (تعديل 1) بدل Object.values نستخدم Object.entries
+       علشان نجيب userId (key) مع بيانات اليوزر
+    ========================================================= */
+    const found = Object.entries(users).find(([id, u]) =>
+      u.email === loginEmail.value.trim() &&
+      u.password === loginPassword.value
+    );
+
+    if (!found) {
       toastr.warning("Invalid email or password");
       btnText.classList.remove("d-none");
-    btnLoader.classList.add("d-none");
-    loginBtn.disabled = false;
+      btnLoader.classList.add("d-none");
+      loginBtn.disabled = false;
       return;
     }
 
-    // toastr & redirect حسب role
+    const [userId, user] = found; // ✅ userId هو الـ key الحقيقي (sellerId)
+
+    // toastr
     toastr.success(`Welcome back, ${user.name}!`);
+
+    /* =========================================================
+       ✅✅✅ (تعديل 2) خزني sellerId في localStorage
+       ده اللي كان ناقص وسبب إن sellerId بيرجع null
+    ========================================================= */
+    localStorage.setItem("sellerId", userId); // ✅ مهم جدًا للسيلر
+
+    // (اختياري) تخزين currentUser مع id
+    localStorage.setItem("currentUser", JSON.stringify({
+      id: userId, // ✅
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }));
+
+
+    // // toastr & redirect حسب role
+    // toastr.success(`Welcome back, ${user.name}!`);
 
     localStorage.setItem("currentUser", JSON.stringify({
     name: user.name,
@@ -116,7 +172,7 @@ loginForm.addEventListener("submit", async (e) => {
       if (user.role === "admin") {
         window.location.href = "../../../pages/admin/dashboard.html";
       } else if (user.role === "seller") {
-        window.location.href = "../../../pages/seller/html/seller-dashboard.html";
+        window.location.href = "../../../../pages/seller/html/seller-dashboard.html";
       } else {
         window.location.href = "../../../pages/customer/customer-products.html";
       }

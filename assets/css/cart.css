@@ -1,0 +1,441 @@
+/* ============================================================
+   assets/css/cart.css
+   Task 3 — Cart Page Styles
+   ============================================================ */
+
+:root {
+  --primary-blue: #007bff;
+  --dark-navy: #1a1a2e;
+  --text-gray: #6c757d;
+  --bg-light: #f8f9fa;
+  --border-color: #e9ecef;
+  --card-radius: 12px;
+}
+
+/* ── Body ────────────────────────────────────────────────── */
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--bg-light);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Page Layout ─────────────────────────────────────────── */
+.page-main {
+  flex: 1;
+  padding: 2.5rem 0 3rem;
+}
+
+.page-title-block {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--dark-navy);
+  margin-bottom: 0.2rem;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-gray);
+  margin: 0;
+}
+
+/* ── Empty State ─────────────────────────────────────────── */
+#empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4.5rem 1rem;
+  text-align: center;
+}
+
+.empty-icon-wrap {
+  width: 80px;
+  height: 80px;
+  background-color: #eef0f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.empty-icon-wrap .fa-shopping-bag {
+  font-size: 1.9rem;
+  color: var(--text-gray);
+}
+
+.empty-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-navy);
+  margin-bottom: 0.4rem;
+}
+
+.empty-text {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  margin-bottom: 1.75rem;
+}
+
+/* ── Shared Buttons ──────────────────────────────────────── */
+.btn-primary-action {
+  background-color: var(--primary-blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.75rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.btn-primary-action:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Cart Item Card ──────────────────────────────────────── */
+/* Layout matches screenshot:
+   [ img ] [ name + brand        ] [ 🗑 ]
+            [ qty controls  $price ]
+*/
+.cart-item-card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cart-item-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background: #f8f9fa;
+}
+
+/* Middle section: name, brand, then bottom row with qty + price */
+.cart-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.2rem;
+}
+
+.cart-item-name {
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--dark-navy);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 85%;
+}
+
+.cart-item-brand {
+  font-size: 0.83rem;
+  color: var(--text-gray);
+  margin-bottom: 0.75rem;
+}
+
+/* Bottom row: qty controls on left, price on right */
+.cart-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.qty-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: #495057;
+  padding: 0;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.qty-btn:hover {
+  background: var(--bg-light);
+  border-color: #adb5bd;
+}
+
+.qty-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-width: 20px;
+  text-align: center;
+  color: var(--dark-navy);
+}
+
+.cart-item-price {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--dark-navy);
+  white-space: nowrap;
+}
+
+/* Trash icon — top right of the card's middle section */
+.btn-remove {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+  flex-shrink: 0;
+  align-self: flex-start;
+  transition: opacity 0.15s;
+  opacity: 0.8;
+}
+
+.btn-remove:hover {
+  opacity: 1;
+}
+
+/* ── Cart Bottom Actions ─────────────────────────────────── */
+.cart-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btn-text-link {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.btn-text-link:hover {
+  color: var(--primary-blue);
+}
+
+.btn-text-link.text-danger {
+  color: #6c757d;
+}
+
+.btn-text-link.text-danger:hover {
+  color: #dc3545;
+}
+
+/* ── Order Summary Card ──────────────────────────────────── */
+.summary-card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 1.75rem;
+}
+
+.summary-card-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--dark-navy);
+  margin-bottom: 1.2rem;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  color: #495057;
+  margin-bottom: 0.6rem;
+}
+
+.summary-divider {
+  border-top: 1px solid var(--border-color);
+  margin: 1rem 0;
+}
+
+.summary-total-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--dark-navy);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.site-footer {
+  background: #fff;
+  border-top: 1px solid var(--border-color);
+  padding: 2.5rem 0 1.5rem;
+  margin-top: auto;
+}
+
+.footer-brand {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: var(--dark-navy);
+}
+
+.footer-tagline {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  line-height: 1.65;
+}
+
+.footer-heading {
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--dark-navy);
+  margin-bottom: 0.85rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.4rem;
+}
+
+.footer-links a {
+  color: var(--text-gray);
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover {
+  color: var(--primary-blue);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  text-align: center;
+}
+
+.footer-bottom p {
+  font-size: 0.82rem;
+  color: var(--text-gray);
+  margin: 0;
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+.cart-toast {
+  position: fixed;
+  top: 28px;
+  right: 28px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid #28a745;
+  border-radius: 10px;
+  padding: 0.85rem 1.3rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--dark-navy);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  z-index: 9999;
+}
+
+.cart-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .cart-item-card {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .cart-item-img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .cart-actions-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .cart-toast {
+    left: 12px;
+    right: 12px;
+    top: 16px;
+  }
+}
+
+/* ── Clear Cart Modal ────────────────────────────────────── */
+.clear-modal-icon {
+  width: 64px;
+  height: 64px;
+  background-color: #fff5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.clear-modal-icon .fa-trash-alt {
+  font-size: 1.6rem;
+  color: #dc3545;
+}
