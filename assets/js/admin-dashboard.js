@@ -2,6 +2,7 @@ import { db } from './firebase.js';
 import { ref, get, onValue } 
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+
 let allUsers = {};
 let allProducts = {};
 let allOrders = {};
