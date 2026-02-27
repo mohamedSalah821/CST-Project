@@ -1,10 +1,20 @@
 // assets/js/dashboard.js
-import { db } from "./firebase.js";
+import { db } from "../../../assets/js/firebase.js";
+
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 /* =========================
    Helpers
 ========================= */
+
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
 function getSellerId() {
   return localStorage.getItem("sellerId") || null;
@@ -45,6 +55,8 @@ function getMonthIndex(order) {
 
 let revenueChart = null;
 let productsChart = null;
+const topProductsContainer = document.getElementById("topProductsList");
+
 
 function initRevenueChart() {
   const canvas = document.getElementById("revenueChart");
@@ -100,6 +112,7 @@ function initProductsChart() {
   });
 }
 
+
 /* =========================
    Firebase Listeners
 ========================= */
@@ -116,50 +129,95 @@ function listenDashboardFromFirebase() {
     return;
   }
 
-  // ===== ORDERS =====
-  const ordersRootRef = ref(db, "orders");
-  onValue(ordersRootRef, (snap) => {
-    const root = snap.val() || {};
+// ===== ORDERS =====
+// ===== ORDERS =====
+const ordersRootRef = ref(db, "orders");
+onValue(ordersRootRef, (snap) => {
+  const root = snap.val() || {};
 
-    const allOrders = [];
-    for (const customerKey of Object.keys(root)) {
-      const customerOrders = root[customerKey] || {};
-      for (const orderPushId of Object.keys(customerOrders)) {
-        allOrders.push(customerOrders[orderPushId]);
-      }
+  const allOrders = [];
+  for (const customerKey of Object.keys(root)) {
+    const customerOrders = root[customerKey] || {};
+    for (const orderPushId of Object.keys(customerOrders)) {
+      allOrders.push(customerOrders[orderPushId]);
     }
+  }
 
-    const sellerOrders = allOrders.filter((o) => {
-      const items = Array.isArray(o?.items) ? o.items : [];
-      return items.some((it) => it?.sellerId === sellerId);
-    });
-
-    const totalOrders = sellerOrders.length;
-    let totalRevenue = 0;
-    const monthly = Array(12).fill(0);
-
-    for (const o of sellerOrders) {
-      const t = calcSellerOrderTotal(o, sellerId);
-      totalRevenue += t;
-
-      const mi = getMonthIndex(o);
-      if (mi !== null) monthly[mi] += t;
-    }
-
-    const avgOrderValue = totalOrders ? (totalRevenue / totalOrders) : 0;
-
-    setText("totalOrders", totalOrders);
-    setText("totalRevenue", money(totalRevenue));
-    setText("avgOrderValue", money(avgOrderValue));
-
-    if (revenueChart) {
-      revenueChart.data.datasets[0].data = monthly.map(v => Number(v.toFixed(2)));
-      revenueChart.update();
-    }
+  const sellerOrders = allOrders.filter((o) => {
+    const items = Array.isArray(o?.items) ? o.items : [];
+    return items.some((it) => String(it?.sellerId || "") === String(sellerId));
   });
 
+
+
+  const totalOrders = sellerOrders.length;
+  let totalRevenue = 0;
+  const monthly = Array(12).fill(0);
+
+  // ✅ Top selling counts
+  const counts = {}; // productName -> qty sold
+
+  for (const o of sellerOrders) {
+    const t = calcSellerOrderTotal(o, sellerId);
+    totalRevenue += t;
+
+    const mi = getMonthIndex(o);
+    if (mi !== null) monthly[mi] += t;
+
+    // ✅ build top selling
+    const items = Array.isArray(o?.items) ? o.items : [];
+    for (const it of items) {
+      if (String(it?.sellerId || "") !== String(sellerId)) continue;
+
+      const name = String(it?.name || "Unknown").trim();
+      const qty = Number(it?.qty ?? it?.quantity ?? 0) || 0;
+      if (!name || qty <= 0) continue;
+
+      counts[name] = (counts[name] || 0) + qty;
+    }
+  }
+
+  const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
+
+  setText("totalOrders", totalOrders);
+  setText("totalRevenue", money(totalRevenue));
+  setText("avgOrderValue", money(avgOrderValue));
+
+  if (revenueChart) {
+    revenueChart.data.datasets[0].data = monthly.map((v) => Number(v.toFixed(2)));
+    revenueChart.update();
+  }
+
+  // ✅ Render top selling (Top 5)
+  const topProductsContainer = document.getElementById("topProductsList");
+  if (topProductsContainer) {
+    const top = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    // console.log("top selling counts:", counts, "top:", top);
+
+    if (!top.length) {
+      topProductsContainer.innerHTML =
+        `<div class="text-muted small">No sales yet</div>`;
+    } else {
+      topProductsContainer.innerHTML = top
+        .map(
+          ([name, qty], index) => `
+            <div class="top-product-item">
+              <div class="rank">#${index + 1}</div>
+              <div class="name">${escapeHtml(name)}</div>
+              <div class="qty">${qty} sold</div>
+            </div>
+          `
+        )
+        .join("");
+    }
+  }
+});
+
   // ===== PRODUCTS (total + by category chart) =====
-// ===== PRODUCTS (total + by category chart) =====
+
 const productsRef = ref(db, `seller-products/${sellerId}`);
 const categoriesRef = ref(db, `seller-categories/${sellerId}`);
 
@@ -260,6 +318,8 @@ onValue(productsRef, (snap) => {
   updateProductsChart();
 });
 }
+
+
 
 /* =========================
    Boot

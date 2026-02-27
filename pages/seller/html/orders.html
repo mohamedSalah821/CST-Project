@@ -17,10 +17,56 @@
   <div id="sidebar-container"></div>
 
   <main class="main-content p-4">
-    <!-- Topbar -->
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h4 class="m-0">Orders Mangement</h4>
+<!-- ✅ Header like Products -->
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Manage Orders</h2>
+    <p class="page-subtitle">Here you can manage your orders easily!</p>
+  </div>
+
+  <div class="page-actions">
+    <button class="btn-soft" id="refreshOrdersBtn" type="button">
+      <i class="fa-solid fa-rotate me-2"></i>Refresh
+    </button>
+
+    
+  </div>
+</div>
+
+<!-- ✅ Filters bar like Products -->
+<div class="filters-card mt-3">
+  <div class="filters-row">
+    <div class="filter-item search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="orderSearch" type="text" placeholder="Search orders..." />
     </div>
+
+    <div class="filter-item">
+      <i class="fa-solid fa-layer-group"></i>
+      <select id="statusFilter">
+        <option value="all">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <i class="fa-solid fa-sort"></i>
+      <select id="sortFilter">
+        <option value="date_desc">Newest</option>
+        <option value="date_asc">Oldest</option>
+        <option value="total_desc">Total High</option>
+        <option value="total_asc">Total Low</option>
+      </select>
+    </div>
+
+    <button class="btn-clear" id="clearFiltersBtn" type="button">
+      <i class="fa-solid fa-rotate-left me-2"></i>Clear
+    </button>
+  </div>
+</div>
 
     <!-- Card -->
     <div class="cardx mt-3">
@@ -141,11 +187,11 @@
 
       // ✅ بعد ما sidebar يتحط، حمّل سكربت الحساب
 
-      const mod = await import("./../../../assets/js/sidebar-account.js");
+      const mod = await import("../js/sidebar-account.js");
       await mod.initSidebarAccount();
     });
 </script>
-  <script src="./../js/orders.js"></script>
+ <script type="module" src="../js/seller-order.js"></script>
    
 </body>
 </html>

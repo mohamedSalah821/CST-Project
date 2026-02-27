@@ -110,3 +110,34 @@ body{ background: var(--bg); }
   width: 100% !important;
   height: 100% !important;
 }
+
+.top-product-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:8px;
+  background:#f8fafc;
+  transition:.2s;
+}
+
+.top-product-item:hover{
+  background:#eef2ff;
+}
+
+.top-product-item .rank{
+  font-weight:800;
+  color:#4f46e5;
+  width:40px;
+}
+
+.top-product-item .name{
+  flex:1;
+  font-weight:600;
+}
+
+.top-product-item .qty{
+  font-weight:800;
+  color:#059669;
+}
