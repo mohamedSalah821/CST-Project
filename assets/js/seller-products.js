@@ -30,12 +30,28 @@ const tableBody = document.getElementById("productTable");
 // عناصر المودال
 const modalEl = document.getElementById("productModal");
 const nameInput = document.getElementById("name");
-const categoryInput = document.getElementById("category");
 const priceInput = document.getElementById("price");
 const quantityInput = document.getElementById("quntity");
 const imageInput = document.getElementById("image");
 const previewImg = document.getElementById("preview");
 const descInput = document.getElementById("description");
+
+// Category UI
+const categorySelect = document.getElementById("categorySelect");
+const categoryModalEl = document.getElementById("categoryModal");
+const categoryNameInput = document.getElementById("categoryName");
+const saveCategoryBtn = document.getElementById("saveCategoryBtn");
+const bsCategoryModal = categoryModalEl ? new bootstrap.Modal(categoryModalEl) : null;
+
+// ===== Filters DOM =====
+const searchInputEl = document.getElementById("searchInput");
+const categoryFilterEl = document.getElementById("categoryFilter");
+const priceSortEl = document.getElementById("priceSort");
+const flagFilterEl = document.getElementById("flagFilter");
+const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+
+// categories cache
+let categoriesCache = {}; // {catId: {name, createdAt}}
 // زر الحفظ في المودال
 const saveBtn = modalEl?.querySelector(".modal-footer .btn.btn-primary");
 
@@ -89,6 +105,200 @@ function refreshBulkUI() {
   }
 }
 
+function renderProducts(entries) {
+  if (!entries.length) {
+    tableBody.innerHTML =
+      `<tr><td colspan="7" class="text-muted text-center py-4">
+        No products found
+      </td></tr>`;
+    refreshBulkUI();
+    return;
+  }
+
+  tableBody.innerHTML = entries.map(([id, p]) => {
+
+    const name = String(p?.name ?? "");
+    const desc = String(p?.description ?? "");
+    const categoryLabel =
+      String(p?.categoryName ?? p?.category ?? "Uncategorized").trim();
+    const isFlagged = Boolean(p?.flagged);
+
+    return `
+      <tr class="product-row ${isFlagged ? "flagged-row" : ""}">
+        
+        <!-- Checkbox -->
+        <td style="width:42px;">
+          <input class="form-check-input product-check"
+                 type="checkbox"
+                 data-check="${id}"
+                 ${selectedIds.has(id) ? "checked" : ""}>
+        </td>
+
+        <!-- Product -->
+        <td>
+          <div class="d-flex align-items-center gap-3">
+            ${p.imageUrl
+              ? `<img src="${p.imageUrl}"
+                     style="width:46px;height:46px;object-fit:cover;border-radius:12px;">`
+              : `<div style="width:46px;height:46px;border-radius:12px;background:#eef2ff;"></div>`
+            }
+
+            <div class="fw-semibold">
+              ${escapeHtml(name)}
+            </div>
+          </div>
+        </td>
+
+        <!-- Description -->
+        <td title="${escapeHtml(desc)}">
+          ${escapeHtml(desc.slice(0, 60))}
+          ${desc.length > 60 ? "..." : ""}
+        </td>
+
+        <!-- Category -->
+        <td>
+          <span class="cat-pill">
+            <i class="fa-solid fa-tag me-1"></i>
+            ${escapeHtml(categoryLabel)}
+          </span>
+        </td>
+
+        <!-- Price -->
+        <td class="fw-semibold">
+          $${Number(p?.price ?? 0).toFixed(2)}
+        </td>
+
+        <!-- Quantity -->
+        <td>
+          <span class="qty-pill">
+            ${Number(p?.quantity ?? 0)}
+          </span>
+        </td>
+
+        <!-- Actions -->
+        <td class="text-end actions-col">
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-outline-primary"
+                    data-edit="${id}">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger"
+                    data-del="${id}">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </td>
+
+      </tr>
+    `;
+  }).join("");
+
+  // bind delete
+  tableBody.querySelectorAll("[data-del]").forEach((btn) => {
+    btn.addEventListener("click", () =>
+      deleteProduct(btn.dataset.del)
+    );
+  });
+
+  // bind edit
+  tableBody.querySelectorAll("[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", () =>
+      startEdit(btn.dataset.edit)
+    );
+  });
+
+  // bind checkboxes
+  tableBody.querySelectorAll("[data-check]").forEach((ch) => {
+    ch.addEventListener("change", () => {
+      const id = ch.dataset.check;
+      if (ch.checked) selectedIds.add(id);
+      else selectedIds.delete(id);
+      refreshBulkUI();
+    });
+  });
+
+  refreshBulkUI();
+}
+
+
+function populateCategoryFilterFromData() {
+  if (!categoryFilterEl) return;
+
+  const cats = new Set();
+  Object.values(cacheData || {}).forEach(p => {
+   const c = String(p?.categoryName ?? p?.category ?? "Uncategorized").trim();
+    if (c) cats.add(c);
+  });
+
+  const current = categoryFilterEl.value || "all";
+  const options = ["all", ...Array.from(cats).sort((a, b) => a.localeCompare(b))];
+
+  categoryFilterEl.innerHTML = options
+    .map(v => `<option value="${escapeHtml(v)}">${v === "all" ? "All Categories" : escapeHtml(v)}</option>`)
+    .join("");
+
+  // حاول يحافظ على الاختيار الحالي لو موجود
+  if (options.includes(current)) categoryFilterEl.value = current;
+  else categoryFilterEl.value = "all";
+}
+
+function applyFilters() {
+  const q = (searchInputEl?.value || "").trim().toLowerCase();
+  const cat = categoryFilterEl?.value || "all";
+  const sort = priceSortEl?.value || "none";
+  const flag = flagFilterEl?.value || "all";
+
+  let entries = Object.entries(cacheData || {});
+
+  // 1) search
+  if (q) {
+    entries = entries.filter(([id, p]) => {
+      const name = String(p?.name ?? "").toLowerCase();
+      const desc = String(p?.description ?? "").toLowerCase();
+      return name.includes(q) || desc.includes(q);
+    });
+  }
+// 2) category
+if (cat !== "all") {
+  entries = entries.filter(([id, p]) =>
+    String(p?.categoryName ?? p?.category ?? "Uncategorized").trim() === cat
+  );
+}
+
+  // 3) flagged
+  if (flag !== "all") {
+    entries = entries.filter(([id, p]) => {
+      const isFlagged = Boolean(p?.flagged);
+      return flag === "flagged" ? isFlagged : !isFlagged;
+    });
+  }
+
+  // 4) price sort
+  if (sort !== "none") {
+    entries.sort((a, b) => {
+      const pa = Number(a[1]?.price ?? 0);
+      const pb = Number(b[1]?.price ?? 0);
+      return sort === "asc" ? (pa - pb) : (pb - pa);
+    });
+  }
+
+  renderProducts(entries);
+}
+
+function clearFilters() {
+  if (searchInputEl) searchInputEl.value = "";
+  if (categoryFilterEl) categoryFilterEl.value = "all";
+  if (priceSortEl) priceSortEl.value = "none";
+  if (flagFilterEl) flagFilterEl.value = "all";
+  applyFilters();
+}
+// ===== Filters events =====
+searchInputEl?.addEventListener("input", applyFilters);
+categoryFilterEl?.addEventListener("change", applyFilters);
+priceSortEl?.addEventListener("change", applyFilters);
+flagFilterEl?.addEventListener("change", applyFilters);
+clearFiltersBtn?.addEventListener("click", clearFilters);
 /* =========================
    2) Cloudinary Upload
 ========================= */
@@ -115,6 +325,73 @@ async function uploadToCloudinary(file) {
 
   return data.secure_url;
 }
+/* =========================
+   3) Categories
+========================= */
+
+function normalizeCategoryName(name) {
+  return String(name ?? "").trim();
+}
+
+function renderCategoryOptions(selectedId = "") {
+  if (!categorySelect) return;
+
+  const entries = Object.entries(categoriesCache || {});
+  entries.sort((a, b) => (a[1]?.name || "").localeCompare(b[1]?.name || ""));
+
+  categorySelect.innerHTML = `
+    <option value="" disabled ${selectedId ? "" : "selected"}>Select Category</option>
+    ${entries.map(([id, c]) => `
+      <option value="${id}" ${id === selectedId ? "selected" : ""}>
+        ${escapeHtml(c?.name ?? "")}
+      </option>
+    `).join("")}
+  `;
+}
+
+function listenCategories() {
+  const sellerId = getSellerId();
+  const catsRef = ref(db, `seller-categories/${sellerId}`);
+
+  onValue(catsRef, (snap) => {
+    categoriesCache = snap.val() || {};
+    renderCategoryOptions();
+  });
+}
+saveCategoryBtn?.addEventListener("click", async () => {
+  const sellerId = getSellerId();
+  const name = normalizeCategoryName(categoryNameInput?.value);
+
+  if (!name) return alert("Enter category name");
+
+  // prevent duplicates by name (case-insensitive)
+  const exists = Object.values(categoriesCache || {}).some(c =>
+    (c?.name || "").toLowerCase() === name.toLowerCase()
+  );
+  if (exists) return alert("Category already exists");
+
+  saveCategoryBtn.disabled = true;
+  const old = saveCategoryBtn.textContent;
+  saveCategoryBtn.textContent = "Saving...";
+
+  try {
+    const newRef = push(ref(db, `seller-categories/${sellerId}`));
+    await set(newRef, {
+      name,
+      createdAt: Date.now(),
+    });
+
+    categoryNameInput.value = "";
+    bsCategoryModal?.hide();
+    showToast("Category added ✅");
+  } catch (e) {
+    console.error(e);
+    alert("Failed to add category");
+  } finally {
+    saveCategoryBtn.disabled = false;
+    saveCategoryBtn.textContent = old;
+  }
+});
 
 /* =========================
    3) Preview للصورة قبل الرفع
@@ -142,76 +419,13 @@ function listenProducts() {
 
   onValue(productsRef, (snap) => {
     cacheData = snap.val() || {};
-    const list = Object.entries(cacheData);
 
-    if (list.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-muted">No products yet</td></tr>`;
-      selectedIds.clear();
-      refreshBulkUI();
-      return;
-    }
+    // لو اتحذفت منتجات كانت متعلمة bulk
+    const idsNow = new Set(Object.keys(cacheData || {}));
+    selectedIds.forEach((id) => { if (!idsNow.has(id)) selectedIds.delete(id); });
 
-    // لو منتجات اتحذفت من الداتا، شيلها من selectedIds
-    const idsNow = new Set(list.map(([id]) => id));
-    selectedIds.forEach((id) => {
-      if (!idsNow.has(id)) selectedIds.delete(id);
-    });
-
-    tableBody.innerHTML = list.map(([id, p]) => `
-      <tr>
-        <td style="width:42px;">
-          <input class="form-check-input product-check" type="checkbox" data-check="${id}"
-            ${selectedIds.has(id) ? "checked" : ""}>
-        </td>
-
-        <td>
-          <div class="d-flex align-items-center gap-2">
-            ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:42px;height:42px;object-fit:cover;border-radius:10px;">` : ""}
-            <div>${escapeHtml(p.name ?? "")}</div>
-          </div>
-        </td>
-<td title="${escapeHtml(p.description ?? "")}">
-  ${escapeHtml((p.description ?? "").slice(0, 40))}${(p.description ?? "").length > 40 ? "..." : ""}
-</td>
-        <td>${escapeHtml(p.category ?? "")}</td>
-        <td>$${Number(p.price ?? 0).toFixed(2)}</td>
-        <td>${Number(p.quantity ?? 0)}</td>
-
-       <td class="text-end actions-col">
-  <div class="action-buttons">
-    <button class="btn btn-sm btn-outline-primary" data-edit="${id}">
-      <i class="fa-solid fa-pen"></i>
-    </button>
-
-    <button class="btn btn-sm btn-outline-danger" data-del="${id}">
-      <i class="fa-solid fa-trash"></i>
-    </button>
-  </div>
-</td>
-      </tr>
-    `).join("");
-
-    // bind delete (single)
-    tableBody.querySelectorAll("[data-del]").forEach((btn) => {
-      btn.addEventListener("click", () => deleteProduct(btn.dataset.del));
-    });
-
-    // bind edit
-    tableBody.querySelectorAll("[data-edit]").forEach((btn) => {
-      btn.addEventListener("click", () => startEdit(btn.dataset.edit));
-    });
-
-    // bind row checkboxes
-    tableBody.querySelectorAll("[data-check]").forEach((ch) => {
-      ch.addEventListener("change", () => {
-        const id = ch.dataset.check;
-        if (ch.checked) selectedIds.add(id);
-        else selectedIds.delete(id);
-        refreshBulkUI();
-      });
-    });
-
-    refreshBulkUI();
+    populateCategoryFilterFromData();
+    applyFilters(); // بدل الرندر اليدوي
   });
 }
 
@@ -224,19 +438,17 @@ function resetModal() {
 
   modalEl.querySelector(".modal-title").textContent = "Add Product";
   nameInput.value = "";
-  categoryInput.value = "";
   priceInput.value = "";
   if (quantityInput) quantityInput.value = "";
+  if (descInput) descInput.value = "";
+
+  // reset category dropdown
+  if (categorySelect) categorySelect.value = "";
 
   imageInput.value = "";
-  if (descInput) descInput.value = "";
   previewImg.src = "";
   previewImg.classList.add("d-none");
 }
-
-// زر Add Product
-document.querySelector('[data-bs-target="#productModal"]')
-  ?.addEventListener("click", resetModal);
 
 /* =========================
    6) Save (Add / Update)
@@ -246,13 +458,18 @@ saveBtn?.addEventListener("click", async () => {
   const sellerId = getSellerId();
 
   const name = nameInput.value.trim();
-  const category = categoryInput.value.trim();
+
   const price = Number(priceInput.value);
   const quantity = Number(quantityInput?.value ?? 0);
   const file = imageInput.files?.[0];
-  const description = descInput?.value.trim() || ""; 
+  const description = descInput?.value.trim() || "";
+  const categoryId = categorySelect?.value || "";
+  if (!categoryId) return alert("Select category");
+
+  const categoryName = categoriesCache?.[categoryId]?.name || "";
+  if (!categoryName) return alert("Invalid category");
   if (!name) return alert("Enter product name");
-  if (!category) return alert("Enter category");
+
   if (Number.isNaN(price) || price < 0) return alert("Enter valid price");
   if (!Number.isInteger(quantity) || quantity < 0) return alert("Enter valid quantity");
   if (description.length > 500) return alert("Description is too long (max 500 chars)");
@@ -270,7 +487,8 @@ saveBtn?.addEventListener("click", async () => {
 
       await set(newRef, {
         name,
-        category,
+        categoryId,
+        categoryName,
         price,
         quantity,
         description,
@@ -282,13 +500,13 @@ saveBtn?.addEventListener("click", async () => {
       // ✅ UPDATE
       const updatesObj = {
         name,
-        category,
+        categoryId,
+        categoryName,
         price,
         quantity,
         description,
         updatedAt: Date.now(),
       };
-
       if (file) updatesObj.imageUrl = await uploadToCloudinary(file);
 
       await update(ref(db, `seller-products/${sellerId}/${editingId}`), updatesObj);
@@ -310,7 +528,6 @@ saveBtn?.addEventListener("click", async () => {
 /* =========================
    7) Edit (فتح المودال وتعبئة البيانات)
 ========================= */
-
 function startEdit(id) {
   const p = cacheData[id];
   if (!p) return;
@@ -319,10 +536,27 @@ function startEdit(id) {
   modalEl.querySelector(".modal-title").textContent = "Edit Product";
 
   nameInput.value = p.name ?? "";
-  categoryInput.value = p.category ?? "";
   priceInput.value = p.price ?? 0;
   if (quantityInput) quantityInput.value = p.quantity ?? 0;
   if (descInput) descInput.value = p.description ?? "";
+
+  // category: prefer categoryId, fallback to old string category
+  const cid = p.categoryId ?? "";
+  if (categorySelect) {
+    if (cid) {
+      renderCategoryOptions(cid);
+    } else {
+      // لو المنتج القديم كان مخزن category كـ string
+      renderCategoryOptions();
+      // محاولة اختيار بنفس الاسم (لو موجود)
+      const oldName = String(p.categoryName ?? p.category ?? "").toLowerCase();
+      const found = Object.entries(categoriesCache || {}).find(([_, c]) =>
+        String(c?.name || "").toLowerCase() === oldName
+      );
+      if (found) categorySelect.value = found[0];
+    }
+  }
+
   imageInput.value = "";
   if (p.imageUrl) {
     previewImg.src = p.imageUrl;
@@ -424,5 +658,5 @@ confirmBulkDeleteBtn?.addEventListener("click", async () => {
 /* =========================
    Start
 ========================= */
-
+listenCategories();
 listenProducts();

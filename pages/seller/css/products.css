@@ -1,15 +1,569 @@
-body {
-    background: #f5f7fa;
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --line:#e9eef6;
+  --text:#0f172a;
+  --muted:#64748b;
+  --primary:#2563eb;
+  --primary-soft:#e8f0ff;
+  --danger-soft:#ffe9e9;
+  --shadow:0 8px 24px rgba(15,23,42,.05);
 }
 
-.card {
-    border-radius: 12px;
+body{ background:var(--bg); }
+
+/* ===== Page Header ===== */
+.page-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
 }
 
-.badge-status {
-    background: #e0edff;
-    color: #0f172a;
-    padding: 5px 12px;
-    border-radius: 20px;
+.page-title{
+  font-weight:700;
+  margin:0;
 }
+
+.page-sub{
+  margin:0;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.header-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* Soft Buttons */
+.btn-soft-danger{
+  background:var(--danger-soft);
+  border:0;
+  color:#b91c1c;
+  border-radius:12px;
+}
+.btn-soft-secondary{
+  background:#f1f5f9;
+  border:0;
+  border-radius:12px;
+}
+
+/* ===== Toolbar ===== */
+.toolbar{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  box-shadow:var(--shadow);
+}
+
+.toolbar-left{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.search-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  padding:10px 14px;
+  border-radius:12px;
+  min-width:260px;
+}
+.search-box input{
+  border:0;
+  outline:0;
+  background:transparent;
+  width:100%;
+}
+
+.tool-select{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 14px;
+  background:#fff;
+  min-width:150px;
+}
+
+.btn-clear{
+  border-radius:12px;
+}
+
+/* ===== Table Card ===== */
+.table-card{
+  background:var(--card);
+  border-radius:16px;
+  border:1px solid var(--line);
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.table thead th{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--muted);
+  border-bottom:1px solid var(--line);
+  padding-bottom:14px;
+}
+
+.table tbody td{
+  border-top:1px solid #eef2f7;
+  padding:16px 10px;
+}
+
+.table tbody tr:hover{
+  background:#fbfdff;
+}
+
+/* Category Pill */
+.cat-pill{
+  background:var(--primary-soft);
+  color:#5b6ee7;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+
+/* Action Buttons */
+.action-buttons{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+}
+.action-buttons .btn{
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.page-header .page-title{
+    color:#5b6ee7
+}
+/* ===== Header Buttons Layout ===== */
+.header-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  align-items:center;
+}
+
+/* شكل زرار عام */
+.btn-pill{
+  border-radius:999px;
+  padding:.55rem .9rem;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.06);
+}
+
+/* Hover / Active Animation */
+.btn-pill:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.10);
+}
+.btn-pill:active{
+  transform: translateY(0);
+  box-shadow: 0 8px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* Disabled nicer */
+.btn-pill:disabled{
+  opacity:.55;
+  transform:none;
+  box-shadow:none;
+  cursor:not-allowed;
+}
+
+/* ===== Soft Buttons Colors ===== */
+.btn-soft-danger{
+  background: rgba(239, 68, 68, .10);
+  border: 1px solid rgba(239, 68, 68, .18);
+  color:#b91c1c;
+}
+.btn-soft-danger:hover{ filter: brightness(0.98); }
+
+.btn-soft-secondary{
+  background: rgba(100, 116, 139, .10);
+  border: 1px solid rgba(100, 116, 139, .18);
+  color:#334155;
+}
+.btn-soft-secondary:hover{ filter: brightness(0.98); }
+
+/* ===== Add Product Glow (اختياري) ===== */
+.btn-glow{
+  position:relative;
+  overflow:hidden;
+}
+.btn-glow::after{
+  content:"";
+  position:absolute;
+  inset:-40% -60%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: translateX(-60%) rotate(12deg);
+  transition: transform .6s ease;
+}
+.btn-glow:hover::after{
+  transform: translateX(60%) rotate(12deg);
+}
+
+/* Mobile tweak */
+@media (max-width:576px){
+  .header-actions{
+    justify-content:stretch;
+  }
+  .header-actions .btn{
+    flex:1;
+    justify-content:center;
+  }
+}
+/* ===== Gradient Buttons ===== */
+.btn-animated{
+  border: none;
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  transition: all .3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+
+
+
+/* Active */
+.btn-animated:active{
+  transform: scale(.97);
+}
+
+/* Shine Animation */
+.btn-animated::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.4),transparent);
+  transition:.6s;
+}
+.btn-animated:hover::before{
+  left:100%;
+}
+
+/* ===== Specific Gradients ===== */
+
+/* Primary */
+.btn-gradient-primary{
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+}
+
+/* Secondary */
+.btn-gradient-secondary{
+  background: linear-gradient(135deg, #64748b, #94a3b8);
+}
+
+/* Danger */
+.btn-gradient-danger{
+  background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+/* Disabled */
+.btn-animated:disabled{
+  opacity:.6;
+  transform:none;
+  box-shadow:none;
+  cursor:not-allowed;
+}
+
+/* Responsive */
+@media(max-width:576px){
+  .header-actions{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .header-actions .btn{
+    width:100%;
+    justify-content:center;
+  }
+}
+
+/* ==============================
+   MODERN TOOLBAR
+==============================*/
+
+.toolbar-modern{
+  background:#ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+  box-shadow: 0 12px 30px rgba(15,23,42,.05);
+  border:1px solid #eef2f7;
+}
+
+.toolbar-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+}
+
+/* ===== Search ===== */
+.search-modern{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#ffffff;
+  padding:10px 14px;
+  border-radius:14px;
+  border:1px solid #e2e8f0;
+  min-width:240px;
+  transition:.3s;
+}
+
+.search-modern:hover{
+  box-shadow:0 8px 18px rgba(59,130,246,.15);
+}
+
+.search-modern input{
+  border:none;
+  outline:none;
+  background:transparent;
+  width:100%;
+  font-size:14px;
+}
+
+/* ===== Selects ===== */
+.select-modern{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#ffffff;
+  padding:10px 14px;
+  border-radius:14px;
+  border:1px solid #e2e8f0;
+  transition:.3s;
+}
+
+.select-modern:hover{
+  box-shadow:0 8px 18px rgba(99,102,241,.12);
+}
+
+.select-modern select{
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:14px;
+  cursor:pointer;
+}
+
+/* ===== Clear Button ===== */
+.btn-clear-modern{
+  background: linear-gradient(135deg,#f87171,#ef4444);
+  border:none;
+  color:#fff;
+  border-radius:999px;
+  padding:9px 18px;
+  font-weight:600;
+  transition:.3s;
+  box-shadow:0 8px 20px rgba(239,68,68,.25);
+}
+
+.btn-clear-modern:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 28px rgba(239,68,68,.35);
+}
+
+.btn-clear-modern:active{
+  transform:scale(.97);
+}
+
+/* ===== Mobile ===== */
+@media(max-width:768px){
+  .toolbar-modern{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .toolbar-group{
+    justify-content:stretch;
+  }
+
+  .search-modern,
+  .select-modern{
+    width:100%;
+  }
+
+  .btn-clear-modern{
+    width:100%;
+    text-align:center;
+  }
+}
+
+/* ===== Table Styling ===== */
+.table{
+  border-collapse: separate;
+  border-spacing: 0 10px; /* يخلي كل row زي كارت */
+}
+
+.table thead th{
+  border: 0 !important;
+}
+
+.table tbody tr{
+  background:#fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgba(15,23,42,.04);
+  transition: .25s ease;
+}
+
+.table tbody tr:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 35px rgba(15,23,42,.08);
+}
+
+.table tbody td{
+  border: 0 !important;
+  vertical-align: middle;
+  padding: 14px 12px;
+}
+
+.table tbody tr td:first-child{
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+
+.table tbody tr td:last-child{
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+/* product cell */
+.p-cell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.p-img{
+  width:44px;
+  height:44px;
+  border-radius: 12px;
+  object-fit:cover;
+  border: 1px solid #eef2f7;
+}
+
+.p-title{
+  font-weight:700;
+  color:#0f172a;
+  line-height:1.15;
+}
+
+.p-sub{
+  font-size:12px;
+  color:#64748b;
+  margin-top:2px;
+}
+
+/* category pill (badge) */
+.cat-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(0,0,0,.05);
+}
+
+/* flagged badge */
+.flag-pill{
+  display:inline-flex;
+  align-items:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+/* action buttons nicer */
+.actions-col .btn{
+  width:38px;
+  height:38px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 12px !important;
+  transition:.25s;
+}
+
+.actions-col .btn:hover{
+  transform: translateY(-2px);
+}
+
+/* description clamp */
+.desc-clip{
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ======================
+   FLAGGED ROW STYLE
+======================*/
+
+/* ===== Flagged row (works reliably in tables) ===== */
+tr.flagged-row > td{
+  background: #fff1f2 !important;
+  border-top: 1px solid #fecdd3 !important;
+  border-bottom: 1px solid #fecdd3 !important;
+  opacity: .92;
+}
+
+/* الخط الأحمر على الشمال */
+tr.flagged-row > td:first-child{
+  border-left: 4px solid #d82d2d !important;
+}
+
+/* hover */
+tr.flagged-row:hover > td{
+  opacity: 1;
+}
+
+/* muted text */
+tr.flagged-row .fw-semibold{
+  color:#7f1d1d !important;
+}
+tr.flagged-row > td{
+  color:#9f1239 !important;
+}
+
 

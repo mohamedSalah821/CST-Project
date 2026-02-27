@@ -186,34 +186,42 @@ export async function placeOrder(shippingInfo) {
   const safeId = (user?.id || user?.email || "guest").replace(/[.#$[\]]/g, "_");
   const dateStr = new Date().toISOString().split("T")[0];
 
-  // Build order matching the required structure exactly
+  // ✅ Build sellerStatus per seller
+  const sellerStatus = {};
+  cart.forEach((i) => {
+    const sid = String(i?.sellerId || "").trim();
+    if (sid) sellerStatus[sid] = "pending";
+  });
+
   const order = {
-    id: "", // filled in after push
-    customer:
-      user?.name || `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+    id: "",
+    customer: user?.name || `${shippingInfo.firstName} ${shippingInfo.lastName}`.trim(),
     date: dateStr,
-    status: "pending",
+
+    status: "pending",         // عام (للتوافق)
+    sellerStatus,              // ✅ لكل سيلر
+
     address: `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state}`,
+
     items: cart.map((i) => ({
       name: i.name,
-      price: parseFloat((i.price * i.qty).toFixed(2)),
-      qty: i.qty,
+      price: parseFloat(Number(i.price || 0).toFixed(2)), // سعر الوحدة
+      qty: Number(i.qty || 0),
+      lineTotal: parseFloat((Number(i.price || 0) * Number(i.qty || 0)).toFixed(2)),
       sellerId: i.sellerId || "",
+      productId: i.id || "",
     })),
   };
 
-  // Push to Firebase: orders/{customerId}/{autoId}
   const newRef = await push(ref(db, `orders/${safeId}`), order);
   const shortId = "ORD-" + newRef.key.substring(1, 9).toUpperCase();
 
-  // Write the generated id back into the same node
   await set(ref(db, `orders/${safeId}/${newRef.key}/id`), shortId);
 
   localStorage.removeItem(CART_KEY);
   updateNavBadge();
   return true;
 }
-
 // ── Toast ─────────────────────────────────────────────────────
 export function showToast(message, type = "success") {
   const old = document.getElementById("cart-toast");

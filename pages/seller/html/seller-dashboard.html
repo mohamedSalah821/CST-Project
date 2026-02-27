@@ -26,50 +26,91 @@
 
       
         <!-- 🔹 Main Content -->
-        <main class="main-content p-4">
-            <h2> OVerview</h2>
+       <main class="main-content p-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="page-title mb-1">Welcome back,</h1>
+    <p class="page-subtitle mb-0">Here's Your Current Sales Overiew</p>
+  </div>
 
-            <div class="mainwrapper">
-                <div class="container">
-                    <div class="row g-3">
+  <div class="container-fluid px-0">
+    <!-- Stat cards -->
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">TOTAL REVENUE</div>
+            <div class="stat-value" id="totalRevenue">0 </div>
+          </div>
+          <div class="stat-icon bg-purple">
+            <i class="fa-solid fa-dollar-sign"></i>
+          </div>
+        </div>
+      </div>
 
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="p-3  rounded shadow-sm">
-                                <p>Total Revenue</p>
-                                <h1>589 $</h1>
-                            </div>
-                        </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">TOTAL ORDERS</div>
+            <div class="stat-value" id="totalOrders">0</div>
+          </div>
+          <div class="stat-icon bg-red">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </div>
+        </div>
+      </div>
 
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="p-3  rounded shadow-sm">
-                                <p>Orders</p>
-                                <h1>5</h1>
-                            </div>
-                        </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">TOTAL PRODUCTS</div>
+            <div class="stat-value"  id="totalProducts">0</div>
+          </div>
+          <div class="stat-icon bg-green">
+            <i class="fa-solid fa-cube"></i>
+          </div>
+        </div>
+      </div>
 
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="p-3  rounded shadow-sm">
-                                <p>Products</p>
-                                <h1>3</h1>
-                            </div>
-                        </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">AVG ORDER VALUE</div>
+            <div class="stat-value" id="avgOrderValue">0</div>
+          </div>
+          <div class="stat-icon bg-pink">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="p-3  rounded shadow-sm">
-                                <p>Average Order Value</p>
-                                <h1>7</h1>
-                            </div>
-                        </div>
+    <!-- Charts row (س cards) -->
+ 
+  <div class="row g-4 mt-1">
 
-                    </div>
-                </div>
-                <div class="chart mt-4" style="max-width:800px; height:300px;">
-                    <canvas id="revenueChart"></canvas>
-                </div>
+  <!-- category Chart -->
+  <div class="col-12 col-lg-6">
+    <div class="panel-card">
+      <h5 class="panel-title">Products by Category</h5>
+      <div class="panel-body">
+        <canvas id="productsChart"></canvas>
+      </div>
+    </div>
+  </div>
 
+  <!-- Revenue Chart -->
+  <div class="col-12 col-lg-6">
+    <div class="panel-card">
+      <h5 class="panel-title">Monthly Revenue</h5>
+      <div class="panel-body">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+  </div>
 
-        </main>
-
+</div>
+</main>
 
  
 
@@ -78,7 +119,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="./../js/dashboard.js"></script>
+    <script type="module" src="./../../../assets/js/Seller-dashboard.js"></script>
 </body>
 
 

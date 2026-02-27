@@ -7,16 +7,16 @@
 
     </button>
 
-    <span class="fw-bold">Seller Dashboard</span>
+    <span class="fw-bold"><i class="fa-solid fa-store me-2"></i>Seller Dashboard</span>
   </div>
 </nav>
 
 <!-- ✅ Desktop Sidebar (يظهر في lg+) -->
 <nav class="sidebar-desktop d-none d-lg-flex flex-column justify-content-between">
   <div>
-    <h4>Seller Dashboard</h4>
+    <h4> <i class="fa-solid fa-store me-2"></i>Seller Dashboard</h4>
     <ul class="list-unstyled">
-      <li><a href="./seller-dashboard.html"><i class="fa-solid fa-chart-line me-2"></i> Overview</a></li>
+      <li><a href="./seller-dashboard.html"><i class="fa-solid fa-chart-line me-2 active"></i> Overview</a></li>
       <li><a href="./seller-products.html"><i class="fa-solid fa-box me-2"></i> Products</a></li>
       <li><a href="./orders.html"><i class="fa-solid fa-bag-shopping me-2"></i> Orders</a></li>
     </ul>
@@ -28,22 +28,22 @@
       <h6 class="m-0 text-white">Account</h6>
 
       <a href="./profile.html" class="side-link">
-        <i class="fa-solid fa-pen me-2"></i> 
+        <i class="fa-solid fa-pen me-2"></i>
       </a>
     </div>
 
     <!-- ✅ Seller info -->
     <div class="mt-2 p-2 rounded" style="background: rgba(255,255,255,.06);">
-      <div  class="sellerNameText fw-semibold text-white">Seller</div>
-      <div  class="sellerEmailText small" style="color:#cbd5e1;">seller@email.com</div>
+      <div class="sellerNameText fw-semibold text-white">Seller</div>
+      <div class="sellerEmailText small" style="color:#cbd5e1;">seller@email.com</div>
     </div>
 
     <a class="side-link mt-2" href="../../../index.html">
       <i class="fa-solid fa-house me-2"></i> Home
     </a>
     <a class="side-link mt-2" href="#" id="logoutBtnDesktop">
-  <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
-</a>
+      <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+    </a>
   </div>
 
 
@@ -52,15 +52,19 @@
 <!-- ✅ Mobile Offcanvas Sidebar (يظهر في الموبايل فقط) -->
 <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
-    <h5 class="m-0">Seller Dashboard</h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    <h4 class="m-0">
+      <i class="fa-solid fa-store me-2"></i>Seller Dashboard
+    </h4>
+
+    <button type="button" class="btn-close  offcanvas-close-out" data-bs-dismiss="offcanvas"
+      aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
   <div class="offcanvas-body d-flex flex-column justify-content-between">
     <div>
       <ul class="list-unstyled">
         <li class="mb-2">
-          <a class="mobile-link" href="./seller-dashboard.html"><i class="fa-solid fa-chart-line me-2"></i> Overview</a>
+          <a class="mobile-link" href="./seller-dashboard.html"><i class="fa-solid fa-chart-line me-2  active"></i> Overview</a>
         </li>
         <li class="mb-2">
           <a class="mobile-link" href="./seller-products.html"><i class="fa-solid fa-box me-2"></i> Products</a>
@@ -70,30 +74,30 @@
         </li>
       </ul>
     </div>
-  <div class="pt-3 border-top border-secondary">
+    <div class="pt-3 border-top border-secondary">
 
-    <div class="d-flex align-items-center justify-content-between">
-      <h6 class="m-0 text-white">Account</h6>
+      <div class="d-flex align-items-center justify-content-between">
+        <h6 class="m-0 text-white">Account</h6>
 
-      <a href="./profile.html" class="side-link">
-        <i class="fa-solid fa-pen me-2"></i> 
+        <a href="./profile.html" class="side-link">
+          <i class="fa-solid fa-pen me-2"></i>
+        </a>
+
+      </div>
+
+      <!-- ✅ Seller info -->
+      <div class="mt-2 p-2 rounded" style="background: rgba(255,255,255,.06);">
+        <div class="sellerNameText fw-semibold text-white">Seller</div>
+        <div class="sellerEmailText small" style="color:#cbd5e1;">seller@email.com</div>
+      </div>
+
+      <a class="side-link mt-2" href="../../../index.html">
+        <i class="fa-solid fa-house me-2"></i> Home
       </a>
-
+      <a class="side-link mt-2" href="#" id="logoutBtnMobile">
+        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+      </a>
     </div>
-
-    <!-- ✅ Seller info -->
-    <div class="mt-2 p-2 rounded" style="background: rgba(255,255,255,.06);">
-      <div  class="sellerNameText fw-semibold text-white">Seller</div>
-      <div  class="sellerEmailText small" style="color:#cbd5e1;">seller@email.com</div>
-    </div>
-
-    <a class="side-link mt-2" href="../../../index.html">
-      <i class="fa-solid fa-house me-2"></i> Home
-    </a>
-    <a class="side-link mt-2" href="#" id="logoutBtnMobile">
-  <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
-</a>
-  </div>
 
 
 
