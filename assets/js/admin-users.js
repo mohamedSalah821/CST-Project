@@ -495,12 +495,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-window.logout = async function() {
-    try {
-        await signOut(auth);
-        window.location.href = '../../login.html';
-    } catch (error) {
-        console.error('Logout error:', error);
-        alert('Error logging out!');
-    }
+/* 🚪 EVENT LOGOUT
+=========================== */
+window.logout = function(e) {
+    if (e) e.preventDefault(); // منع الرابط من تحديث الصفحة
+
+    // 1. مسح السيشن اليدوي
+    localStorage.removeItem('admin_session');
+    
+    // 2. تأكيد المسح لكل شيء احتياطياً
+    localStorage.clear();
+    sessionStorage.clear();
+
+    console.log("Logged out successfully");
+
+    // 3. التوجيه الفوري
+    window.location.replace("../../login.html");
 };

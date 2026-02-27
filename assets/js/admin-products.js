@@ -309,20 +309,29 @@ window.bulkUnflagProducts = async function() {
     }
 };
 
+// 1. الدالة نظيفة فقط للفلترة والبحث
 function applyFiltersAndSearch() {
     const searchTerm = document.getElementById('searchProduct')?.value.toLowerCase().trim() || '';
     let filtered = Object.values(allProducts);
 
+    // تطبيق فلاتر الحالة
     if (currentFilter === 'active') filtered = filtered.filter(p => !p.flagged && p.quantity > 0);
     if (currentFilter === 'flagged') filtered = filtered.filter(p => p.flagged);
     if (currentFilter === 'outofstock') filtered = filtered.filter(p => p.quantity <= 0);
 
+    // تطبيق البحث
     if (searchTerm) {
-        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm));
+        filtered = filtered.filter(p => 
+            (p.name || '').toLowerCase().includes(searchTerm) || 
+            (p.category || '').toLowerCase().includes(searchTerm)
+        );
     }
 
     displayProducts(filtered);
 }
+
+// 2. ربط الحدث (يُنفذ مرة واحدة فقط عند تشغيل الملف)
+document.getElementById('searchProduct')?.addEventListener('input', applyFiltersAndSearch);
 
 window.viewProduct = function(id) {
     const product = allProducts[id];
@@ -498,12 +507,14 @@ window.filterProducts = function(type) {
         });
     }
 
-window.logout = async function() {
-    try {
-        await signOut(auth);
-        window.location.href = '../../login.html';
-    } catch (error) {
-        console.error('Logout error:', error);
-        alert('Error logging out!');
-    }
+/* 🚪 EVENT LOGOUT
+=========================== */
+window.logout = function(e) {
+    if (e) e.preventDefault(); 
+
+    localStorage.removeItem('admin_session');
+    
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.replace("../../login.html");
 };

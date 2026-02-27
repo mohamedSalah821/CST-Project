@@ -285,50 +285,10 @@ function setupRealtimeListeners() {
 /* ===========================
    7️⃣ SIDEBAR TOGGLE
 =========================== */
-document.addEventListener('DOMContentLoaded', () => {
-    initDashboard();
-    const toggleBtn = document.getElementById('sidebarToggle');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('show');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        });
-    }
-});
-
-/* 🔐 SESSION CHECK
-=========================== */
-onAuthStateChanged(auth, (user) => {
-    const currentPath = window.location.pathname.toLowerCase();
-    const isLoginPage = currentPath.includes('login.html');
-
-    if (user.role === 'admin') {
-        console.log('User logged in:', user.email);
-        
-        if (isLoginPage) {
-            window.location.href = '/pages/admin/dashboard.html'; 
-        }
-    } else {
-        if (!isLoginPage) {
-            console.log("No user found, redirecting to login...");
-            window.location.href = '../../login.html'; 
-        }
-    }
-});
-/* ===========================
-   🚪 LOGOUT FUNCTION
-=========================== */
-window.logout = async function() {
-    try {
-        await signOut(auth);
-        window.location.href = '../../login.html';
-    } catch (error) {
-        console.error('Logout error:', error);
-        alert('Error logging out!');
-    }
-};
 
 document.addEventListener('DOMContentLoaded', function() {
+        initDashboard();
+
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
     const overlay = document.getElementById('sidebarOverlay');
@@ -347,3 +307,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+/* 🚪 EVENT LOGOUT
+=========================== */
+window.logout = function(e) {
+    if (e) e.preventDefault(); 
+
+    localStorage.removeItem('admin_session');
+    
+    localStorage.clear();
+    sessionStorage.clear();
+
+    window.location.replace("../../login.html");
+};
