@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -19,6 +18,9 @@ body {
     overflow-x: hidden;
 }
 
+/* ===========================
+   SIDEBAR
+=========================== */
 .sidebar {
     position: fixed;
     left: 0;
@@ -124,6 +126,7 @@ body {
     background: rgba(239, 68, 68, 0.25);
     color: #ff6b6b;
 }
+
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -142,24 +145,26 @@ body {
     display: block;
     opacity: 1;
 }
+title{
+    color: var(--primary-gradient) ;
+}
 
+/* ===========================
+   MAIN CONTENT
+=========================== */
 .main-content {
     margin-left: 260px;
     min-height: 100vh;
     transition: var(--transition);
 }
-
 .page-header {
     background: #fff;
     padding: 28px 35px;
     border-bottom: 1px solid #e5e7eb;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
-.page-header h1 {
+.page-header h2 {
     font-size: 2rem;
     font-weight: 800;
     background: var(--primary-gradient);
@@ -168,8 +173,13 @@ body {
 }
 
 .page-header p {
+    font-size: 0.95rem;
     color: #718096;
 }
+
+/* ===========================
+   STAT CARDS
+=========================== */
 .stat-card {
     background: #fff;
     border-radius: 16px;
@@ -196,6 +206,11 @@ body {
     justify-content: center;
     font-size: 1.7rem;
     color: #fff;
+    flex-shrink: 0;
+}
+
+.stat-details {
+    flex: 1;
 }
 
 .stat-details h6 {
@@ -203,50 +218,144 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #718096;
+    margin: 0;
 }
 
 .stat-details h3 {
     font-size: 2rem;
     font-weight: 800;
-    margin: 0;
+    margin: 5px 0 0 0;
 }
 
-.card {
-    border-radius: 16px;
-    border: none;
+/* ===========================
+   MESSAGE CARDS
+=========================== */
+.message-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
     box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    border-left: 4px solid #667eea;
 }
 
-.table thead th {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 1px;
-    background: #f8fafc;
+.message-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
 }
 
-.table tbody tr {
+.message-card.read {
+    opacity: 0.7;
+    border-left-color: #6c757d;
+    background: #f8f9fa;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.message-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.user-details h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.user-details small {
+    color: #6c757d;
+}
+
+.message-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.message-body {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.message-body p {
+    margin: 0;
+    color: #495057;
+    line-height: 1.6;
+}
+
+.message-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* ===========================
+   FILTER TABS
+=========================== */
+.filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-tabs .btn {
+    border-radius: 8px;
+    font-weight: 600;
     transition: var(--transition);
 }
 
-.table tbody tr:hover {
-    background: #f7fafc;
-    transform: scale(1.01);
-}
-.input-group-text {
-    border-radius: 10px 0 0 10px;
+.filter-tabs .btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(102,126,234,0.3);
 }
 
-#searchUser {
-    border-radius: 0 10px 10px 0;
-    transition: var(--transition);
+/* ===========================
+   EMPTY STATE
+=========================== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
 }
 
-#searchUser:focus {
-    box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
-    border-color: #667eea;
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
 }
 
+/* ===========================
+   BUTTONS
+=========================== */
 .btn {
     border-radius: 10px;
     font-weight: 600;
@@ -263,12 +372,14 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(102,126,234,0.5);
 }
+
 .btn-group {
     gap: 6px;
 }
 
 .btn-outline-warning,
-.btn-outline-danger {
+.btn-outline-danger,
+.btn-outline-success {
     border: 2px solid currentColor;
     transition: var(--transition);
 }
@@ -277,72 +388,41 @@ body {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     border-color: transparent;
     color: #fff;
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .btn-outline-danger:hover {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
     border-color: transparent;
     color: #fff;
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
-.modal-content {
-    border-radius: 16px;
-    border: none;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+.btn-outline-success:hover {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    border-color: transparent;
+    color: #fff;
+    transform: scale(1.05);
 }
 
-.modal-header {
-    border-bottom: 1px solid #f0f0f0;
-    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-}
-
-.form-control,
-.form-select {
+/* ===========================
+   FORMS
+=========================== */
+.form-control {
     border-radius: 10px;
     border: 2px solid #e2e8f0;
     padding: 10px 14px;
     transition: var(--transition);
 }
 
-.form-control:focus,
-.form-select:focus {
+.form-control:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
 }
-@media (max-width: 991.98px) {
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-        padding: 10px !important;
-    }
-}
 
-@media (max-width: 767.98px) {
-    #sidebarToggle {
-        display: flex !important;
-    }
-
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.show {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        margin-left: 0 !important;
-        padding-top: 70px;
-    }
-
-    .stat-card {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
+/* ===========================
+   TOGGLE BUTTON
+=========================== */
 #sidebarToggle {
     position: fixed;
     top: 20px;
@@ -363,4 +443,80 @@ body {
 
 #sidebarToggle:hover {
     transform: scale(1.1) rotate(90deg);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 991.98px) {
+    .main-content {
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #sidebarToggle {
+        display: flex !important;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding-top: 80px;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .message-header {
+        flex-direction: column;
+    }
+
+    .message-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .message-actions .btn {
+        flex: 1;
+    }
+
+    .filter-tabs {
+        flex-direction: column;
+    }
+
+    .filter-tabs .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+
+    .stat-details h3 {
+        font-size: 1.5rem;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .message-card {
+        padding: 15px;
+    }
 }
