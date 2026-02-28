@@ -152,4 +152,14 @@ color: #fff;
   color: #fff
 }
 
-
+@media (max-width: 992px){
+  .main-content{
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+@media (max-width: 576px){
+  .panel-card{
+    box-shadow: 0 10px 26px rgba(15,23,42,.08);
+  }
+}

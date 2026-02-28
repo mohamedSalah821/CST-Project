@@ -309,3 +309,116 @@ body{
 .btn-reset:hover{
   background:var(--soft);
 }
+
+
+/* =========================
+   Mobile Polish
+========================= */
+@media (max-width: 576px){
+
+  /* خلي المساحة أقل (خصوصًا لو sidebar بيزق المحتوى) */
+  .main-content{
+    padding: 12px !important;
+  }
+
+  .profile-wrap{
+    padding: 0 !important;
+    max-width: 100%;
+  }
+
+  /* الكارت يبقى أنعم في الموبايل */
+  .panel-card{
+    border-radius: 16px;
+  }
+
+  /* Header */
+  .panel-head{
+    padding: 16px;
+    gap: 10px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .panel-title{
+    font-size: 20px;   /* كان 30 كبير */
+    line-height: 1.2;
+  }
+
+  .panel-sub{
+    font-size: 12px;
+  }
+
+  .btn-ghost{
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hero */
+  .profile-hero{
+    padding: 16px;
+    gap: 12px;
+  }
+
+  #profileImg{
+    width: 56px;
+    height: 56px;
+  }
+
+  .hero-name{
+    font-size: 16px;
+  }
+
+  .hero-meta{
+    font-size: 12px;
+    word-break: break-word; /* عشان الإيميل الطويل */
+  }
+
+  /* Body padding */
+  .panel-body{
+    padding: 16px;
+  }
+
+  /* خلي كل ال grids عمود واحد */
+  .split,
+  .split-one{
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  /* Inputs أصغر شوية ومتناسقة */
+  .input-groupx{
+    min-height: 46px;
+    border-radius: 14px;
+  }
+
+  .form-controlx{
+    font-size: 14px;
+    padding: 11px 10px;
+  }
+
+  .ig-icon{
+    padding: 0 8px;
+  }
+
+  .ig-btn{
+    padding: 0 10px;
+  }
+
+  /* Actions: زرار تحت زرار */
+  .actions{
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-save,
+  .btn-reset{
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Divider أقل */
+  .divider{
+    margin: 16px 0;
+  }
+}
