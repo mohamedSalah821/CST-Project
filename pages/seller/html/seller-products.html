@@ -34,98 +34,98 @@
 
   <div id="sidebar-container"></div>
 
- <main class="main-content p-4">
+  <main class="main-content p-4">
 
-  <!-- Page Header -->
-  <div class="page-header mb-4">
-    <div>
-      <h2 class="page-title">Manage Products</h2>
-      <p class="page-sub"> Here you can Manage Your Product Easly !</p>
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+      <div>
+        <h2 class="page-title">Manage Products</h2>
+        <p class="page-sub"> Here you can Manage Your Product Easly !</p>
+      </div>
+
+      <div class="header-actions">
+
+        <button id="bulkDeleteBtn" class="btn btn-gradient-danger btn-animated" disabled>
+          <i class="fa-solid fa-trash-can me-2"></i>Delete Selected
+        </button>
+
+        <a id="addCategoryBtn" href="seller-category.html" class="btn btn-gradient-secondary btn-animated">
+          <i class="fa-solid fa-tags me-2"></i>Manage Categories
+        </a>
+
+        <button id="addproduct" class="btn btn-gradient-primary btn-animated" data-bs-toggle="modal"
+          data-bs-target="#productModal">
+          <i class="fa-solid fa-plus me-2"></i>Add Product
+        </button>
+
+      </div>
     </div>
 
-   <div class="header-actions">
+    <!-- Toolbar -->
+    <div class="toolbar-modern mb-4">
 
-  <button id="bulkDeleteBtn" class="btn btn-gradient-danger btn-animated" disabled>
-    <i class="fa-solid fa-trash-can me-2"></i>Delete Selected
-  </button>
+      <div class="toolbar-group">
 
- <a id="addCategoryBtn" href="seller-category.html" class="btn btn-gradient-secondary btn-animated">
-  <i class="fa-solid fa-tags me-2"></i>Manage Categories
-</a>
+        <div class="search-modern">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="searchInput" type="text" placeholder="Search products..." />
+        </div>
 
-  <button id="addproduct" class="btn btn-gradient-primary btn-animated"
-    data-bs-toggle="modal" data-bs-target="#productModal">
-    <i class="fa-solid fa-plus me-2"></i>Add Product
-  </button>
+        <div class="select-modern">
+          <i class="fa-solid fa-layer-group"></i>
+          <select id="categoryFilter">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
 
-</div>
-  </div>
+        <div class="select-modern">
+          <i class="fa-solid fa-sort"></i>
+          <select id="priceSort">
+            <option value="none">Price</option>
+            <option value="asc">Low → High</option>
+            <option value="desc">High → Low</option>
+          </select>
+        </div>
 
- <!-- Toolbar -->
-<div class="toolbar-modern mb-4">
+        <div class="select-modern">
+          <i class="fa-solid fa-flag"></i>
+          <select id="flagFilter">
+            <option value="all">Flag</option>
+            <option value="flagged">Flagged</option>
+            <option value="ok">Not Flagged</option>
+          </select>
+        </div>
 
-  <div class="toolbar-group">
+      </div>
 
-    <div class="search-modern">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input id="searchInput" type="text" placeholder="Search products..." />
+      <button id="clearFiltersBtn" class="btn btn-clear-modern">
+        <i class="fa-solid fa-rotate-left me-2"></i>Clear
+      </button>
+
+    </div>
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th style="width:42px;">
+                <input class="form-check-input" type="checkbox" id="selectAll">
+              </th>
+              <th>Product</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="select-modern">
-      <i class="fa-solid fa-layer-group"></i>
-      <select id="categoryFilter">
-        <option value="all">All Categories</option>
-      </select>
-    </div>
-
-    <div class="select-modern">
-      <i class="fa-solid fa-sort"></i>
-      <select id="priceSort">
-        <option value="none">Price</option>
-        <option value="asc">Low → High</option>
-        <option value="desc">High → Low</option>
-      </select>
-    </div>
-
-    <div class="select-modern">
-      <i class="fa-solid fa-flag"></i>
-      <select id="flagFilter">
-        <option value="all">Flag</option>
-        <option value="flagged">Flagged</option>
-        <option value="ok">Not Flagged</option>
-      </select>
-    </div>
-
-  </div>
-
-  <button id="clearFiltersBtn" class="btn btn-clear-modern">
-    <i class="fa-solid fa-rotate-left me-2"></i>Clear
-  </button>
-
-</div>
-  <!-- Table -->
-  <div class="table-card">
-    <div class="table-responsive">
-      <table class="table align-middle">
-        <thead>
-          <tr>
-            <th style="width:42px;">
-              <input class="form-check-input" type="checkbox" id="selectAll">
-            </th>
-            <th>Product</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th class="text-end">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="productTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-</main>
+  </main>
 
   <!-- Enter Data  Modal -->
   <div class="modal fade" id="productModal">
@@ -142,12 +142,13 @@
             <option value="" selected disabled>Select Category</option>
           </select>
 
-      
+
           <input type="number" id="price" class="form-control mb-2" placeholder="Price">
           <input type="number" id="quntity" class="form-control mb-2" placeholder="Quntity">
           <textarea id="description" class="form-control mb-2" rows="3" placeholder="Description"></textarea>
-          <input type="file" id="image" class="form-control mb-2" accept="image/*">
-          <img id="preview" class="w-100 rounded d-none" style="max-height:200px; object-fit:cover;">
+          <input type="file" id="image" class="form-control mb-2" accept="image/*" multiple>
+          <!-- previews grid -->
+          <div id="previews" class="d-flex flex-wrap gap-2 mt-2"></div>
 
         </div>
 
@@ -192,26 +193,26 @@
   </div>
 
   <!-- Add Category Modal -->
-<div class="modal fade" id="categoryModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Category</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+  <div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
 
-      <div class="modal-body">
-        <input type="text" id="categoryName" class="form-control" placeholder="Category name (e.g. clothes)">
-        <div class="text-muted small mt-2">Tip: use simple names like clothes, electronics…</div>
-      </div>
+        <div class="modal-body">
+          <input type="text" id="categoryName" class="form-control" placeholder="Category name (e.g. clothes)">
+          <div class="text-muted small mt-2">Tip: use simple names like clothes, electronics…</div>
+        </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-        <button id="saveCategoryBtn" class="btn btn-primary">Save</button>
+        <div class="modal-footer">
+          <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button id="saveCategoryBtn" class="btn btn-primary">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
 

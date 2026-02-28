@@ -34,7 +34,10 @@ const nameInput = document.getElementById("name");
 const priceInput = document.getElementById("price");
 const quantityInput = document.getElementById("quntity");
 const imageInput = document.getElementById("image");
-const previewImg = document.getElementById("preview");
+const previewsEl = document.getElementById("previews");
+
+// للصور الحالية أثناء التعديل (لو المنتج عنده صور قديمة)
+let existingImageUrls = [];
 const descInput = document.getElementById("description");
 
 // Category UI
@@ -138,11 +141,13 @@ function renderProducts(entries) {
         <!-- Product -->
         <td>
           <div class="d-flex align-items-center gap-3">
-            ${p.imageUrl
-              ? `<img src="${p.imageUrl}"
-                     style="width:46px;height:46px;object-fit:cover;border-radius:12px;">`
-              : `<div style="width:46px;height:46px;border-radius:12px;background:#eef2ff;"></div>`
-            }
+            ${(() => {
+        const urls = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
+        const thumb = urls[0];
+        return thumb
+          ? `<img src="${thumb}" style="width:46px;height:46px;object-fit:cover;border-radius:12px;">`
+          : `<div style="width:46px;height:46px;border-radius:12px;background:#eef2ff;"></div>`;
+      })()}
 
             <div class="fw-semibold">
               ${escapeHtml(name)}
@@ -228,7 +233,7 @@ function populateCategoryFilterFromData() {
 
   const cats = new Set();
   Object.values(cacheData || {}).forEach(p => {
-   const c = String(p?.categoryName ?? p?.category ?? "Uncategorized").trim();
+    const c = String(p?.categoryName ?? p?.category ?? "Uncategorized").trim();
     if (c) cats.add(c);
   });
 
@@ -260,12 +265,12 @@ function applyFilters() {
       return name.includes(q) || desc.includes(q);
     });
   }
-// 2) category
-if (cat !== "all") {
-  entries = entries.filter(([id, p]) =>
-    String(p?.categoryName ?? p?.category ?? "Uncategorized").trim() === cat
-  );
-}
+  // 2) category
+  if (cat !== "all") {
+    entries = entries.filter(([id, p]) =>
+      String(p?.categoryName ?? p?.category ?? "Uncategorized").trim() === cat
+    );
+  }
 
   // 3) flagged
   if (flag !== "all") {
@@ -326,6 +331,14 @@ async function uploadToCloudinary(file) {
 
   return data.secure_url;
 }
+
+
+async function uploadManyToCloudinary(files) {
+  // ترفعهم كلهم مع بعض (Parallel)
+  const uploads = files.map(f => uploadToCloudinary(f));
+  return Promise.all(uploads); // => array of secure_url
+}
+
 /* =========================
    3) Categories
 ========================= */
@@ -398,16 +411,25 @@ saveCategoryBtn?.addEventListener("click", async () => {
    3) Preview للصورة قبل الرفع
 ========================= */
 
+function renderPreviews(urls) {
+  if (!previewsEl) return;
+  previewsEl.innerHTML = urls.map(u => `
+    <img src="${u}"
+         style="width:78px;height:78px;object-fit:cover;border-radius:12px;border:1px solid #e5e7eb;">
+  `).join("");
+}
+
 imageInput?.addEventListener("change", () => {
-  const file = imageInput.files?.[0];
-  if (!file) {
-    previewImg.classList.add("d-none");
-    previewImg.src = "";
+  const files = Array.from(imageInput.files || []);
+  if (!files.length) {
+    // لو مفيش اختيار جديد، رجّعي صور المنتج القديمة (لو موجودة)
+    renderPreviews(existingImageUrls);
     return;
   }
 
-  previewImg.src = URL.createObjectURL(file);
-  previewImg.classList.remove("d-none");
+  // previews للملفات الجديدة
+  const localUrls = files.map(f => URL.createObjectURL(f));
+  renderPreviews(localUrls);
 });
 
 /* =========================
@@ -436,6 +458,7 @@ function listenProducts() {
 
 function resetModal() {
   editingId = null;
+  existingImageUrls = [];
 
   modalEl.querySelector(".modal-title").textContent = "Add Product";
   nameInput.value = "";
@@ -443,12 +466,10 @@ function resetModal() {
   if (quantityInput) quantityInput.value = "";
   if (descInput) descInput.value = "";
 
-  // reset category dropdown
   if (categorySelect) categorySelect.value = "";
 
   imageInput.value = "";
-  previewImg.src = "";
-  previewImg.classList.add("d-none");
+  renderPreviews([]); // امسحي previews
 }
 
 /* =========================
@@ -462,7 +483,7 @@ saveBtn?.addEventListener("click", async () => {
 
   const price = Number(priceInput.value);
   const quantity = Number(quantityInput?.value ?? 0);
-  const file = imageInput.files?.[0];
+  const files = Array.from(imageInput.files || []);
   const description = descInput?.value.trim() || "";
   const categoryId = categorySelect?.value || "";
   if (!categoryId) return alert("Select category");
@@ -483,8 +504,11 @@ saveBtn?.addEventListener("click", async () => {
       // ✅ ADD
       const newRef = push(ref(db, `seller-products/${sellerId}`));
 
-      let imageUrl = "";
-      if (file) imageUrl = await uploadToCloudinary(file);
+      let imageUrls = [];
+
+      if (files.length) {
+        imageUrls = await uploadManyToCloudinary(files);
+      }
 
       await set(newRef, {
         name,
@@ -493,7 +517,9 @@ saveBtn?.addEventListener("click", async () => {
         price,
         quantity,
         description,
-        imageUrl,
+
+        imageUrls,
+        imageUrl: imageUrls[0] || "",
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
@@ -506,9 +532,19 @@ saveBtn?.addEventListener("click", async () => {
         price,
         quantity,
         description,
+
         updatedAt: Date.now(),
       };
-      if (file) updatesObj.imageUrl = await uploadToCloudinary(file);
+      // لو المستخدم اختار صور جديدة: نستبدل صور المنتج كلها بالصور الجديدة
+      if (files.length) {
+        const newUrls = await uploadManyToCloudinary(files);
+        updatesObj.imageUrls = newUrls;
+        updatesObj.imageUrl = newUrls[0] || "";
+      } else {
+        // لو مفيش رفع جديد: سيبي القديمة زي ما هي
+        updatesObj.imageUrls = existingImageUrls;
+        updatesObj.imageUrl = existingImageUrls[0] || "";
+      }
 
       await update(ref(db, `seller-products/${sellerId}/${editingId}`), updatesObj);
     }
@@ -559,13 +595,12 @@ function startEdit(id) {
   }
 
   imageInput.value = "";
-  if (p.imageUrl) {
-    previewImg.src = p.imageUrl;
-    previewImg.classList.remove("d-none");
-  } else {
-    previewImg.src = "";
-    previewImg.classList.add("d-none");
-  }
+
+  // اجمع الصور من الشكل الجديد أو القديم
+  existingImageUrls = Array.isArray(p.imageUrls) ? p.imageUrls : [];
+  if (!existingImageUrls.length && p.imageUrl) existingImageUrls = [p.imageUrl];
+
+  renderPreviews(existingImageUrls);
 
   bsModal?.show();
 }
