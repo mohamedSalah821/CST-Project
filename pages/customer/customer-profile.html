@@ -127,6 +127,9 @@
         </div>
     </div>
 
+
+    <script src="../../assets/js/Auth/guard.js"></script>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="../../assets/js/navbar.js"></script>
@@ -135,5 +138,8 @@
     <script>
         loadNavbar('../../');
     </script>
+    <script>
+  requireAuth(["customer"]);
+</script>
 </body>
 </html>
