@@ -1,0 +1,162 @@
+/* assets/css/index.css */
+:root {
+    --primary-blue: #0d6efd;
+    --dark-blue: #0056b3;
+    --light-bg: #f8f9fa;
+    --text-dark: #2b2b2b;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* =======================================
+   1. Hero Section
+======================================= */
+/* =======================================
+   1. Hero Section (Background Image with Blue Overlay)
+======================================= */
+.hero-section {
+    /* دمجنا الطبقة الزرقاء الشفافة مع الصورة في سطر واحد */
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.75), rgba(0, 86, 179, 0.85)), 
+                url('https://i.pinimg.com/736x/86/4b/3d/864b3dfb06d61e74290a652325f02e2b.jpg');
+    background-size: cover;
+    background-position: center 20%; /* لضبط تركيز الصورة */
+    background-repeat: no-repeat;
+    
+    color: white;
+    padding: 8rem 0 6rem; /* كبرت المسافات شوية عشان الخلفية تبان أحلى */
+    text-align: center;
+}
+
+.hero-subtitle {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-buttons .btn {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+}
+
+.btn-browse {
+    background-color: white;
+    color: var(--primary-blue);
+    border: none;
+}
+.btn-browse:hover { background-color: #f1f1f1; transform: translateY(-2px); }
+
+.btn-sell {
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.btn-sell:hover { background-color: rgba(255, 255, 255, 0.1); border-color: white; transform: translateY(-2px); }
+
+/* Features Bar */
+.features-bar {
+    margin-top: 4rem;
+}
+.feature-box {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: left;
+    transition: background-color 0.3s;
+}
+.feature-box:hover { background-color: rgba(255, 255, 255, 0.1); }
+.feature-box i { font-size: 1.8rem; color: #a3cbf7; }
+.feature-box h6 { margin: 0; font-weight: 700; font-size: 1rem; }
+.feature-box p { margin: 0; font-size: 0.85rem; color: #d0e4ff; }
+
+/* =======================================
+   2. Categories Section
+======================================= */
+.category-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--light-bg);
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.category-pill:hover {
+    background-color: white;
+    border-color: var(--primary-blue);
+    box-shadow: 0 10px 20px rgba(0, 123, 255, 0.1);
+    transform: translateY(-5px);
+    color: var(--primary-blue);
+}
+.category-pill i { font-size: 2rem; margin-bottom: 10px; }
+.category-pill span { font-weight: 600; font-size: 0.9rem; }
+
+/* =======================================
+   3. Featured Products & Promo Banners
+======================================= */
+.section-title { font-weight: 800; color: var(--text-dark); margin-bottom: 2rem; }
+
+.promo-banner {
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    padding: 3rem;
+    color: white;
+    background-size: cover;
+    background-position: center;
+}
+.promo-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.1));
+}
+.promo-content { position: relative; z-index: 2; }
+
+/* Product Card */
+.home-product-card {
+    border: 1px solid #eee;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.home-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+.home-product-img {
+    height: 220px;
+    width: 100%;
+    object-fit: contain;
+    padding: 1rem;
+    background-color: #fff;
+}
