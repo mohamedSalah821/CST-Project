@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/css/navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="../../assets/css/customer-profile.css">
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <main class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="fw-bold text-dark"><i class="far fa-user-circle text-primary me-2"></i> My Profile</h2>
+                <p class="text-muted">Manage your account details and view your order history.</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="card profile-card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <h4 class="fw-bold border-bottom pb-3 mb-4">Account Information</h4>
+                        
+                        <form id="profileForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Full Name</label>
+                                    <input type="text" class="form-control" id="profileName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Email Address <span class="text-danger">* Cannot be changed</span></label>
+                                    <input type="email" class="form-control bg-light" id="profileEmail" readonly>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label text-muted small fw-bold">Phone Number</label>
+                                    <input type="text" class="form-control" id="profilePhone" placeholder="e.g. 010xxxxxxxx">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label text-muted small fw-bold">Default Shipping Address</label>
+                                    <textarea class="form-control" id="profileAddress" rows="2" placeholder="e.g. 123 Main Street, Cairo"></textarea>
+                                </div>
+                                <div class="col-12 mt-4 text-end">
+                                    <button type="submit" class="btn btn-primary px-5 rounded-pill fw-bold" id="saveProfileBtn">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card orders-card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <h4 class="fw-bold border-bottom pb-3 mb-4"><i class="fas fa-box-open text-primary me-2"></i> Order History</h4>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle custom-table">
+                                <thead class="bg-light text-muted">
+                                    <tr>
+                                        <th class="ps-3 py-3">Order ID</th>
+                                        <th class="py-3">Date</th>
+                                        <th class="py-3">Status</th>
+                                        <th class="py-3 text-end pe-3">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="spinner-border text-primary" role="status"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="orderItemsModal" tabindex="-1" aria-labelledby="orderItemsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold" id="orderItemsModalLabel">
+                        <i class="fas fa-receipt text-primary me-2"></i> Order Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 overflow-auto " style="max-height: 400px;">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="text-muted small text-uppercase">
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Price</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalItemsBody">
+                                </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold fs-5">Total:</td>
+                                    <td class="text-end fw-bold fs-5 text-primary" id="modalGrandTotal">$0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="../../assets/js/navbar.js"></script>
+    <script type="module" src="../../assets/js/customer-profile.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        loadNavbar('../../');
+    </script>
+</body>
+</html>
