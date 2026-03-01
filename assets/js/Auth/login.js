@@ -141,6 +141,18 @@ loginForm.addEventListener("submit", async (e) => {
 
     const [userId, user] = found; // ✅ userId هو الـ key الحقيقي (sellerId)
 
+
+    // CHECK BLOCKED USER
+      if (user.status === "blocked") {
+        toastr.error("Your account has been blocked. Please contact support.");
+
+        btnText.classList.remove("d-none");
+        btnLoader.classList.add("d-none");
+        loginBtn.disabled = false;
+
+        return;
+      }
+
     // toastr
     toastr.success(`Welcome back, ${user.name}!`);
 
@@ -162,11 +174,11 @@ loginForm.addEventListener("submit", async (e) => {
     // // toastr & redirect حسب role
     // toastr.success(`Welcome back, ${user.name}!`);
 
-    localStorage.setItem("currentUser", JSON.stringify({
-    name: user.name,
-    email: user.email,
-    role: user.role
-    }));
+    // localStorage.setItem("currentUser", JSON.stringify({
+    // name: user.name,
+    // email: user.email,
+    // role: user.role
+    // }));
 
     setTimeout(() => {
       if (user.role === "admin") {
