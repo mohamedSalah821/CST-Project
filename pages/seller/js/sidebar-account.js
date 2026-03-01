@@ -1,4 +1,5 @@
-import { db } from "./firebase.js";
+// assets/js/dashboard.js
+import { db } from "../../../assets/js/firebase.js";
 import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 function getSellerId() {

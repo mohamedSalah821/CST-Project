@@ -1,0 +1,424 @@
+/* =========================
+   Modern Seller Profile Theme
+========================= */
+
+:root{
+  --bg1:#f6f8ff;
+  --bg2:#f3f6ff;
+
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#6b7280;
+
+  --primary:#5b6ee7;
+  --primary-dark:#3f51d6;
+
+  --line:rgba(15,23,42,.08);
+  --soft:rgba(15,23,42,.04);
+
+  --radius:18px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+
+  --shadow:0 12px 35px rgba(15,23,42,.08);
+  --ring:0 0 0 4px rgba(91,110,231,.15);
+}
+
+/* =========================
+   Base
+========================= */
+
+body{
+  background:
+    radial-gradient(800px 400px at 0% 0%, rgba(91,110,231,.15), transparent 60%),
+    radial-gradient(800px 400px at 100% 0%, rgba(91,110,231,.08), transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.profile-wrap{
+  max-width: 950px;
+}
+
+/* =========================
+   Card
+========================= */
+
+.panel-card{
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--line);
+  overflow:hidden;
+  animation: fadeUp .6s var(--ease);
+}
+
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(15px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+/* =========================
+   Header
+========================= */
+
+.panel-head{
+  padding:22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+
+.panel-title{
+  margin:0;
+  font-size: 30px;
+  font-weight:700;
+  color:var(--primary);
+}
+
+.panel-sub{
+  margin:4px 0 0;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:400;
+}
+
+.btn-ghost{
+  border:1px solid var(--line);
+  background:#fff;
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:600;
+  transition:.2s var(--ease);
+}
+
+.btn-ghost:hover{
+  background:var(--soft);
+  transform:translateY(-1px);
+}
+
+/* =========================
+   Hero
+========================= */
+
+.profile-hero{
+  padding:20px 22px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(91,110,231,.08), transparent);
+}
+
+#profileImg{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #fff;
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+
+.hero-name{
+  margin:0;
+  font-size:18px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.hero-meta{
+  font-size:13px;
+  color:var(--muted);
+  font-weight:400;
+}
+
+/* =========================
+   Body
+========================= */
+
+.panel-body{
+  padding:24px;
+}
+
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+@media (max-width:768px){
+  .split{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================
+   Labels
+========================= */
+
+.form-label{
+  font-weight:600;
+  font-size:14px;
+  color:var(--text);
+}
+
+/* =========================
+   Inputs
+========================= */
+
+.input-groupx{
+  display:flex;
+  align-items:center;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:#fff;
+  min-height:48px;
+  transition:.2s var(--ease);
+}
+
+.input-groupx:hover{
+  border-color:rgba(91,110,231,.25);
+}
+
+.input-groupx:focus-within{
+  border-color:rgba(91,110,231,.4);
+  box-shadow:var(--ring);
+}
+
+/* icon wrapper */
+.ig-icon{
+  padding:0 10px;
+}
+
+.ig-icon i{
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:rgba(91,110,231,.08);
+  color:var(--primary);
+  font-size:14px;
+}
+
+/* input */
+.form-controlx{
+  flex:1;
+  border:none;
+  outline:none;
+  padding:12px;
+  font-size:14px;
+  font-weight:500;
+  color:var(--text);
+}
+
+.form-controlx::placeholder{
+  color:#9ca3af;
+  font-weight:400;
+}
+
+/* eye button */
+.ig-btn{
+  border:none;
+  background:transparent;
+  padding:0 14px;
+  color:#6b7280;
+  transition:.2s var(--ease);
+}
+
+.ig-btn:hover{
+  color:var(--primary);
+}
+
+/* divider */
+.divider{
+  margin:22px 0;
+  border-top:1px solid var(--line);
+}
+
+/* =========================
+   Message
+========================= */
+
+.msg{
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:13px;
+  font-weight:500;
+  margin-top:12px;
+}
+
+/* success */
+.msg-success{
+  background:rgba(34,197,94,.08);
+  border:1px solid rgba(34,197,94,.25);
+  color:#166534;
+}
+
+/* error */
+.msg-error{
+  background:rgba(239,68,68,.06);
+  border:1px solid rgba(239,68,68,.25);
+  color:#b91c1c;
+}
+
+/* info */
+.msg-info{
+  background:rgba(91,110,231,.08);
+  border:1px solid rgba(91,110,231,.25);
+  color:var(--text);
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.actions{
+  display:flex;
+  gap:14px;
+  margin-top:20px;
+}
+
+.btn-save{
+  flex:1;
+  background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+  border:none;
+  border-radius:var(--radius);
+  padding:12px;
+  font-weight:600;
+  color:#fff;
+  box-shadow:0 10px 22px rgba(91,110,231,.25);
+  transition:.2s var(--ease);
+}
+
+.btn-save:hover{
+  transform:translateY(-2px);
+}
+
+.btn-reset{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:12px 18px;
+  font-weight:600;
+  transition:.2s var(--ease);
+}
+
+.btn-reset:hover{
+  background:var(--soft);
+}
+
+
+/* =========================
+   Mobile Polish
+========================= */
+@media (max-width: 576px){
+
+  /* خلي المساحة أقل (خصوصًا لو sidebar بيزق المحتوى) */
+  .main-content{
+    padding: 12px !important;
+  }
+
+  .profile-wrap{
+    padding: 0 !important;
+    max-width: 100%;
+  }
+
+  /* الكارت يبقى أنعم في الموبايل */
+  .panel-card{
+    border-radius: 16px;
+  }
+
+  /* Header */
+  .panel-head{
+    padding: 16px;
+    gap: 10px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .panel-title{
+    font-size: 20px;   /* كان 30 كبير */
+    line-height: 1.2;
+  }
+
+  .panel-sub{
+    font-size: 12px;
+  }
+
+  .btn-ghost{
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hero */
+  .profile-hero{
+    padding: 16px;
+    gap: 12px;
+  }
+
+  #profileImg{
+    width: 56px;
+    height: 56px;
+  }
+
+  .hero-name{
+    font-size: 16px;
+  }
+
+  .hero-meta{
+    font-size: 12px;
+    word-break: break-word; /* عشان الإيميل الطويل */
+  }
+
+  /* Body padding */
+  .panel-body{
+    padding: 16px;
+  }
+
+  /* خلي كل ال grids عمود واحد */
+  .split,
+  .split-one{
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  /* Inputs أصغر شوية ومتناسقة */
+  .input-groupx{
+    min-height: 46px;
+    border-radius: 14px;
+  }
+
+  .form-controlx{
+    font-size: 14px;
+    padding: 11px 10px;
+  }
+
+  .ig-icon{
+    padding: 0 8px;
+  }
+
+  .ig-btn{
+    padding: 0 10px;
+  }
+
+  /* Actions: زرار تحت زرار */
+  .actions{
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-save,
+  .btn-reset{
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Divider أقل */
+  .divider{
+    margin: 16px 0;
+  }
+}

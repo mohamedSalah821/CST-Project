@@ -1,6 +1,6 @@
-import { db } from './firebase.js';
-import { ref, get, onValue } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { db } from './firebase.js'; 
+import { ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 let allUsers = {};
 let allProducts = {};
@@ -27,7 +27,6 @@ async function initDashboard() {
 /* ===========================
    2️⃣ LOAD DATA
 =========================== */
-
 async function loadUsers() {
     const snapshot = await get(ref(db, 'users'));
     allUsers = snapshot.exists() ? snapshot.val() : {};
@@ -35,9 +34,7 @@ async function loadUsers() {
 
 async function loadProducts() {
     const snapshot = await get(ref(db, 'seller-products'));
-
     let merged = {};
-
     if (snapshot.exists()) {
         Object.values(snapshot.val()).forEach(userProducts => {
             Object.entries(userProducts).forEach(([id, product]) => {
@@ -45,7 +42,6 @@ async function loadProducts() {
             });
         });
     }
-
     allProducts = merged;
 }
 
@@ -55,11 +51,9 @@ async function loadOrders() {
 }
 
 /* ===========================
-   3️⃣ CALCULATE STATISTICS
+   3️⃣ CALCULATE STATISTICS 
 =========================== */
-
 function calculateStatistics() {
-
     const usersArray = Object.values(allUsers);
 
     const totalSellers = usersArray.filter(u =>
@@ -71,78 +65,77 @@ function calculateStatistics() {
     ).length;
 
     const totalProducts = Object.keys(allProducts).length;
-    const totalOrders = Object.keys(allOrders).length;
 
     let totalRevenue = 0;
     let productSales = {};
     let categoryCounts = {};
-    let monthlyRevenue = {};
+    let weeklyRevenue = {};
+    let orderCount = 0;
+    
+    Object.values(allOrders).forEach(userOrders => {
+        
+        Object.values(userOrders).forEach(order => {
+            
+            orderCount++;
+            let orderTotal = 0;
 
-    /* ===== ORDERS LOOP ===== */
-    Object.values(allOrders).forEach(order => {
+            if (order.items && Array.isArray(order.items)) {
+                
+                order.items.forEach(item => {
+                    
+                    const price = parseFloat(item.price) || 0;
+                    const qty = parseInt(item.qty) || 1;
+                    
+                    orderTotal += price * qty;
 
-        totalRevenue += Number(order.total || 0);
+                    const productName = item.name || 'Unknown';
+                    productSales[productName] = (productSales[productName] || 0) + qty;
+                });
+            }
 
-        const productId = order.productId;
-        const quantity = Number(order.quantity || 1);
+            totalRevenue += orderTotal;
 
-        if (productId) {
-            productSales[productId] =
-                (productSales[productId] || 0) + quantity;
+                if (order.date) {
+            const dateObj = new Date(order.date);
+            
+            const dayOfWeek = dateObj.getDay(); 
+            const diff = dateObj.getDate() - dayOfWeek; 
+            const startOfWeek = new Date(dateObj.setDate(diff));
+            
+            const weekLabel = "Week of " + startOfWeek.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+            
+            weeklyRevenue[weekLabel] = (weeklyRevenue[weekLabel] || 0) + orderTotal;
         }
 
-        if (order.createdAt) {
-            const date = new Date(order.createdAt);
-            const month = date.toLocaleString('default', { month: 'short' });
-
-            monthlyRevenue[month] =
-                (monthlyRevenue[month] || 0) + Number(order.total || 0);
-        }
+        updateCharts(totalSellers, totalCustomers, categoryCounts, weeklyRevenue);
+        });
     });
 
-    /* ===== PRODUCTS LOOP ===== */
+       /* ===== PRODUCTS LOOP ===== */
     Object.values(allProducts).forEach(product => {
         const cat = product.category || "Other";
         categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
     });
 
     /* ===== UPDATE CARDS ===== */
-    document.getElementById('totalUsers').textContent =
-        usersArray.length;
-
-    document.getElementById('totalProducts').textContent =
-        totalProducts;
-
-    document.getElementById('totalOrders').textContent =
-        totalOrders;
-
-    document.getElementById('totalSales').textContent =
-        "$" + totalRevenue.toLocaleString();
+    document.getElementById('totalUsers').textContent = usersArray.length;
+    document.getElementById('totalProducts').textContent = Object.keys(allProducts).length;
+    document.getElementById('totalOrders').textContent = orderCount;
+    document.getElementById('totalSales').textContent = "$" + totalRevenue.toFixed(2);
 
     /* ===== UPDATE TABLE ===== */
     renderMostSoldTable(productSales);
 
     /* ===== UPDATE CHARTS ===== */
-    updateCharts(
-        totalSellers,
-        totalCustomers,
-        categoryCounts,
-        monthlyRevenue
-    );
+    updateCharts(totalSellers, totalCustomers, categoryCounts, weeklyRevenue);
 }
 
 /* ===========================
    4️⃣ UPDATE CHARTS
 =========================== */
-
-function updateCharts(sellers, customers, categoryCounts, monthlyRevenue) {
-
-    /* USERS DISTRIBUTION */
-    const usersCtx =
-        document.getElementById('usersChart').getContext('2d');
-
+function updateCharts(sellers, customers, categoryCounts, weeklyRevenue) {
+    const usersCtx = document.getElementById('usersChart').getContext('2d');
     if (usersChart) usersChart.destroy();
-
     usersChart = new Chart(usersCtx, {
         type: 'doughnut',
         data: {
@@ -154,118 +147,136 @@ function updateCharts(sellers, customers, categoryCounts, monthlyRevenue) {
         }
     });
 
-    /* PRODUCTS BY CATEGORY */
-    const categoryCtx =
-        document.getElementById('categoryChart').getContext('2d');
-
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
     if (categoryChart) categoryChart.destroy();
-
     categoryChart = new Chart(categoryCtx, {
         type: 'pie',
         data: {
             labels: Object.keys(categoryCounts),
             datasets: [{
                 data: Object.values(categoryCounts),
-                backgroundColor: [
-                    '#4361ee',
-                    '#f72585',
-                    '#7209b7',
-                    '#3a0ca3',
-                    '#4cc9f0',
-                    '#2ec4b6'
-                ]
+                backgroundColor: ['#4361ee', '#f72585', '#7209b7', '#3a0ca3', '#4cc9f0', '#2ec4b6']
             }]
         }
     });
 
-    /* MONTHLY REVENUE */
-    const revenueCtx =
-        document.getElementById('revenueChart').getContext('2d');
+ const revenueCtx = document.getElementById('revenueChart').getContext('2d');
 
-    if (revenueChart) revenueChart.destroy();
+const gradientFill = revenueCtx.createLinearGradient(0, 0, 0, 400);
+gradientFill.addColorStop(0, 'rgba(46, 196, 182, 0.6)'); 
+gradientFill.addColorStop(0.5, 'rgba(46, 196, 182, 0.2)'); 
+gradientFill.addColorStop(1, 'rgba(46, 196, 182, 0)');    
 
-    revenueChart = new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: Object.keys(monthlyRevenue),
-            datasets: [{
-                label: 'Monthly Revenue',
-                data: Object.values(monthlyRevenue),
-                borderColor: '#2ec4b6',
-                fill: true,
-                tension: 0.3
-            }]
+if (revenueChart) revenueChart.destroy();
+
+revenueChart = new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: Object.keys(weeklyRevenue),
+        datasets: [{
+            label: 'Weekly Revenue',
+            data: Object.values(weeklyRevenue),
+            
+            borderColor: '#2ec4b6',
+            borderWidth: 4,
+            fill: true,
+            backgroundColor: gradientFill,
+            tension: 0.5, 
+            
+            pointRadius: 4,
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 3,
+            pointHoverRadius: 8,
+            pointHoverBorderWidth: 4,
+            
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowOffsetY: 10
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: { top: 20 } 
+        },
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                display: true,
+                grid: { display: false },
+                ticks: { color: '#999', font: { size: 11 } }
+            },
+            y: {
+                display: true,
+                beginAtZero: true,
+                grid: { 
+                    color: 'rgba(200, 200, 200, 0.1)',
+                    drawBorder: false 
+                },
+                ticks: {
+                    color: '#999',
+                    padding: 10,
+                    callback: (value) => '$' + value
+                }
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeInOutQuart'
         }
-    });
+    }
+});
 }
 
 /* ===========================
    5️⃣ MOST SOLD TABLE
 =========================== */
-
 function renderMostSoldTable(productSales) {
-
-    const tbody =
-        document.getElementById('mostSoldProductsTable');
-
-    const sorted =
-        Object.entries(productSales)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
+    const tbody = document.getElementById('mostSoldProductsTable');
+    const sorted = Object.entries(productSales)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
 
     if (sorted.length === 0) {
-        tbody.innerHTML =
-            `<tr>
-                <td colspan="6" class="text-center">
-                    No sales data yet
-                </td>
-            </tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center">No sales data yet</td></tr>`;
         return;
     }
 
     tbody.innerHTML = sorted.map(([id, count], index) => {
-
-        const product =
-            allProducts[id] ||
-            { name: "Deleted Product", category: "N/A", price: 0, quantity: 0 };
+        const product = allProducts[id] || 
+            Object.values(allProducts).find(p => p.name === id) ||
+            { name: id, category: "N/A", price: 0, quantity: 0 };
 
         return `
             <tr>
                 <td>${index + 1}</td>
                 <td class="fw-bold">${product.name}</td>
-                <td>
-                    <span class="badge bg-light text-dark border">
-                        ${product.category}
-                    </span>
-                </td>
+                <td><span class="badge bg-light text-dark border">${product.category}</span></td>
                 <td>$${Number(product.price).toFixed(2)}</td>
                 <td class="fw-bold text-primary">${count}</td>
                 <td>
-                    <span class="badge ${
-                        product.quantity > 0 ? 'bg-success' : 'bg-danger'
-                    }">
+                    <span class="badge ${product.quantity > 0 ? 'bg-success' : 'bg-danger'}">
                         ${product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
                     </span>
                 </td>
-            </tr>
-        `;
+            </tr>`;
     }).join('');
 }
 
 /* ===========================
    6️⃣ REALTIME LISTENERS
 =========================== */
-
 function setupRealtimeListeners() {
-
     onValue(ref(db, 'orders'), () => {
         loadOrders().then(calculateStatistics);
     });
-
     onValue(ref(db, 'users'), () => {
         loadUsers().then(calculateStatistics);
     });
-
     onValue(ref(db, 'seller-products'), () => {
         loadProducts().then(calculateStatistics);
     });
@@ -275,19 +286,36 @@ function setupRealtimeListeners() {
    7️⃣ SIDEBAR TOGGLE
 =========================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+        initDashboard();
 
-    initDashboard();
-
+    const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
 
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
-            document.getElementById('sidebar')
-                .classList.toggle('show');
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('active');
+        });
+    }
 
-            document.getElementById('sidebarOverlay')
-                .classList.toggle('active');
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('active');
         });
     }
 });
+/* 🚪 EVENT LOGOUT
+=========================== */
+window.logout = function(e) {
+    if (e) e.preventDefault(); 
+
+    localStorage.removeItem('admin_session');
+    
+    localStorage.clear();
+    sessionStorage.clear();
+
+    window.location.replace("../../login.html");
+};

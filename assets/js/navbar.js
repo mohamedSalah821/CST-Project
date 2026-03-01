@@ -124,6 +124,7 @@ function loadNavbar(rootPath = "") {
 
       // 3. تفعيل لون الصفحة الحالية (Active Link)
       highlightActiveLink();
+      setupWishlistNavGuard(rootPath);
     })
     .catch((error) => console.error("Error loading the navbar:", error));
 }

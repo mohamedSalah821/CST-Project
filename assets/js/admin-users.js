@@ -1,7 +1,32 @@
 import { db } from './firebase.js';
 import { ref, update, push, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+
+const usersRef = ref(db, 'users');
+
+get(usersRef).then(snapshot => {
+    if (snapshot.exists()) {
+        const users = snapshot.val();
+        // fixMissingCreatedAt(users);
+        displayUsers(users);
+    }
+});
+
+// funn for create create at to calculate new users each month, we can remove it after one month of launch..
+
+// function fixMissingCreatedAt(users) {
+//     Object.entries(users).forEach(([id, user]) => {
+//         if (!user.createdAt) {
+//             update(ref(db, 'users/' + id), {
+//                 createdAt: Date.now() // أفضل من ISO
+//             });
+//         }
+//     });
+// }
 let allUsers = {};
+
+let selectedUsers = new Set();
 
 async function initUsers() {
     await loadUsers();
@@ -17,29 +42,48 @@ async function loadUsers() {
         console.error('Error loading users:', error);
     }
 }
-document.getElementById('searchUser')?.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    
-    const filteredUsers = Object.fromEntries(
-        Object.entries(allUsers).filter(([_, user]) => {
-            const userName = (user.displayName || user.email.split('@')[0]).toLowerCase();
-            const userEmail = user.email.toLowerCase();
-            
-            return userName.includes(searchTerm) || userEmail.includes(searchTerm);
-        })
-    );
 
-    displayUsers(filteredUsers);
+document.addEventListener('DOMContentLoaded', () => {
+    
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        timeOut: 3000
+    };
+
+    const searchInput = document.getElementById('searchUser');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            if (searchTerm === "") {
+                displayUsers(allUsers);
+                return;
+            }
+
+            const filteredEntries = Object.entries(allUsers).filter(([_, user]) => {
+                const name = (user.displayName || "").toLowerCase();
+                const email = (user.email || "").toLowerCase();
+                const emailPrefix = email.split('@')[0]; 
+                return name.includes(searchTerm) || 
+                       email.includes(searchTerm) || 
+                       emailPrefix.includes(searchTerm);
+            });
+
+            const filteredUsers = Object.fromEntries(filteredEntries);
+            displayUsers(filteredUsers);
+        });
+    }
+
+    initUsers(); 
 });
+
 window.toggleUserStatus = async function(userId, currentStatus) {
     const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
     const actionText = newStatus === 'blocked' ? 'Block' : 'Activate';
     
     if (confirm(`Are you sure you want to ${actionText} this user?`)) {
         try {
-            const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js");
-            const { db } = await import('./firebase.js'); 
-            
             await update(ref(db, `users/${userId}`), { status: newStatus });
             toastr.info(`User ${newStatus} successfully!`);
         } catch (error) {
@@ -48,6 +92,7 @@ window.toggleUserStatus = async function(userId, currentStatus) {
         }
     }
 };
+
 window.resetUserPassword = async function(userId) {
     if (!confirm("Reset this user's password to default (123456)?")) return;
 
@@ -66,11 +111,9 @@ window.resetUserPassword = async function(userId) {
 function displayUsers(users) {
     const tbody = document.getElementById('usersTableBody');
 
-    // تأمين البيانات
     const safeUsers = users || {};
     const userEntries = Object.entries(safeUsers);
     
-    // نحول كل يوزر لكائن كامل
     const userList = userEntries.map(([id, user]) => ({
         id,
         ...user
@@ -92,11 +135,8 @@ function displayUsers(users) {
 
     const newUsers = userList.filter(u => {
         if (!u.createdAt) return false;
-
         const createdDate = new Date(u.createdAt);
-
         if (isNaN(createdDate)) return false;
-
         return (
             createdDate.getMonth() === currentMonth &&
             createdDate.getFullYear() === currentYear
@@ -116,18 +156,19 @@ function displayUsers(users) {
     if (totalUsers === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center py-4">
+                <td colspan="6" class="text-center py-4">
                     No users found
                 </td>
             </tr>
         `;
+        updateBulkActionsUI();
         return;
     }
 
     tbody.innerHTML = userEntries.map(([userId, user]) => {
-
         const status = user.status || 'active';
         const isBlocked = status === 'blocked';
+        const isSelected = selectedUsers.has(userId);
 
         const statusBadge = isBlocked
             ? '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3">Blocked</span>'
@@ -138,6 +179,13 @@ function displayUsers(users) {
 
         return `
             <tr>
+                <td class="text-center">
+                    <input type="checkbox" 
+                           class="form-check-input user-checkbox" 
+                           data-user-id="${userId}"
+                           ${isSelected ? 'checked' : ''}
+                           onchange="toggleUserSelection('${userId}')">
+                </td>
                 <td class="text-capitalize fw-semibold">${userName}</td>
                 <td><span class="text-muted">${user.email || '-'}</span></td>
                 <td>
@@ -169,23 +217,206 @@ function displayUsers(users) {
             </tr>
         `;
     }).join('');
-}
-document.addEventListener('DOMContentLoaded', () => {
-    toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        positionClass: 'toast-top-right',
-        timeOut: 3000
-    };
 
-    initUsers(); 
-});
+    updateBulkActionsUI();
+}
+
+window.toggleUserSelection = function(userId) {
+    if (selectedUsers.has(userId)) {
+        selectedUsers.delete(userId);
+    } else {
+        selectedUsers.add(userId);
+    }
+    
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const totalCheckboxes = document.querySelectorAll('.user-checkbox').length;
+    
+    if (selectAllCheckbox) {
+        if (selectedUsers.size === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (selectedUsers.size === totalCheckboxes) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+    
+    updateBulkActionsUI();
+};
+
+window.selectAllUsers = function() {
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    
+    if (selectAllCheckbox.checked) {
+        checkboxes.forEach(cb => {
+            const userId = cb.dataset.userId;
+            selectedUsers.add(userId);
+            cb.checked = true;
+        });
+    } else {
+        selectedUsers.clear();
+        checkboxes.forEach(cb => cb.checked = false);
+    }
+    
+    updateBulkActionsUI();
+};
+
+function updateBulkActionsUI() {
+    const count = selectedUsers.size;
+    const bulkActions = document.getElementById('bulkActionsBar');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    if (bulkActions && selectedCount) {
+        if (count > 0) {
+            bulkActions.style.display = 'flex';
+            selectedCount.textContent = count;
+        } else {
+            bulkActions.style.display = 'none';
+            selectedCount.textContent = '0';
+        }
+    }
+}
+
+window.bulkDeleteUsers = async function() {
+    if (selectedUsers.size === 0) {
+        toastr.warning('⚠️ Please select users first');
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to delete ${selectedUsers.size} user(s)?`)) return;
+
+    try {
+        const promises = [];
+        selectedUsers.forEach(userId => {
+            promises.push(remove(ref(db, `users/${userId}`)));
+        });
+
+        await Promise.all(promises);
+        
+        selectedUsers.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ ${promises.length} user(s) deleted successfully!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error deleting users');
+    }
+};
+
+window.bulkBlockUsers = async function() {
+    if (selectedUsers.size === 0) {
+        toastr.warning('⚠️ Please select users first');
+        return;
+    }
+
+    try {
+        const promises = [];
+        selectedUsers.forEach(userId => {
+            promises.push(update(ref(db, `users/${userId}`), {
+                status: 'blocked'
+            }));
+        });
+
+        await Promise.all(promises);
+        
+        selectedUsers.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ ${promises.length} user(s) blocked!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error blocking users');
+    }
+};
+
+window.bulkUnblockUsers = async function() {
+    if (selectedUsers.size === 0) {
+        toastr.warning('⚠️ Please select users first');
+        return;
+    }
+
+    try {
+        const promises = [];
+        selectedUsers.forEach(userId => {
+            promises.push(update(ref(db, `users/${userId}`), {
+                status: 'active'
+            }));
+        });
+
+        await Promise.all(promises);
+        
+        selectedUsers.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ ${promises.length} user(s) unblocked!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error unblocking users');
+    }
+};
+
+window.bulkResetPassword = async function() {
+    if (selectedUsers.size === 0) {
+        toastr.warning('⚠️ Please select users first');
+        return;
+    }
+
+    if (!confirm(`Reset password to default (123456) for ${selectedUsers.size} user(s)?`)) return;
+
+    try {
+        const promises = [];
+        selectedUsers.forEach(userId => {
+            promises.push(update(ref(db, `users/${userId}`), {
+                password: '123456'
+            }));
+        });
+
+        await Promise.all(promises);
+        
+        selectedUsers.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ Password reset for ${promises.length} user(s)!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error resetting passwords');
+    }
+};
+
 window.addUser = async function() {
     const email = document.getElementById('userEmail').value.trim();
     const role = document.getElementById('userRole').value;
 
     if (!email || !role) {
-        toastr.warning('Please fill all fields!');
+        toastr.error('Please fill all fields!');
         return;
     }
 
@@ -220,13 +451,11 @@ window.addUser = async function() {
 
         toastr.success('User added successfully!');
         
-        // ------------------
     } catch (error) {
         console.error('Error adding user:', error);
         toastr.error('Failed to add user');
     }
 };
-
 
 window.deleteUser = async function(userId) {
     if (!confirm('Are you sure you want to delete this user?')) return;
@@ -259,7 +488,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // قفل السايد بار لو ضغطت على الطبقة المظلمة
     if (overlay) {
         overlay.addEventListener('click', () => {
             sidebar.classList.remove('show');
@@ -267,3 +495,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+/* 🚪 EVENT LOGOUT
+=========================== */
+window.logout = function(e) {
+    if (e) e.preventDefault(); // منع الرابط من تحديث الصفحة
+
+    // 1. مسح السيشن اليدوي
+    localStorage.removeItem('admin_session');
+    
+    // 2. تأكيد المسح لكل شيء احتياطياً
+    localStorage.clear();
+    sessionStorage.clear();
+
+    console.log("Logged out successfully");
+
+    // 3. التوجيه الفوري
+    window.location.replace("../../login.html");
+};

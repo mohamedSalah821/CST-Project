@@ -9,13 +9,13 @@ html, body { overflow-x: hidden; }
   position: fixed;
   left: 0;
   top: 0;
-  background: #0f172a;
+  background:linear-gradient(to bottom ,#1e3c72,#295197);
   color: #fff;
-  padding: 20px;
+  padding: 17px;
 }
 
 .sidebar-desktop a{
-  color: #cbd5e1;
+  color: #d4dbe4;
   text-decoration: none;
   display: block;
   padding: 8px 0;
@@ -34,7 +34,13 @@ html, body { overflow-x: hidden; }
   min-height: 100vh;
   background: #f5f7fa;
 }
-
+h4{
+  
+    background: #ffffff42;
+    padding:20px 10px;
+    border-radius:10px;
+    font-size:21px
+}
 
 @media (min-width: 992px){
   .main-content{
@@ -54,12 +60,9 @@ html, body { overflow-x: hidden; }
 
 /* Mobile links inside offcanvas */
 .offcanvas-start {
-  background: #0f172a;
+  background:linear-gradient(to bottom ,#1e3c72,#295197);
   color: #fff;
   width:250px
-}
-.btn-close {
-    color: #ffffff !important;
 }
 
 
@@ -98,7 +101,7 @@ html, body { overflow-x: hidden; }
 /* ///////////////////// */
 
 .mobnave{
-background-color: #0f172a !important;
+ background:linear-gradient(to left ,#1e3c72,#295197) !important;
 color: #fff;
 }
 .navbar-light .navbar-toggler {
@@ -125,3 +128,38 @@ color: #fff;
 
 
 
+/* عشان زرار الكلوز يطلع برا offcanvas */
+.offcanvas { overflow: visible; } /* مهم */
+
+.offcanvas-close-out{
+  position: absolute;
+  top: 34px;
+  right: -44px;          /* يطلع برا */
+  width: 25px;
+  height: 25px;
+  background: rgba(209, 23, 23, 0.918);
+  border-radius: 50%;
+  opacity: 1;
+  box-shadow: 0 10px 25px rgba(0,0,0,.18);
+ color: #fff
+}
+
+/* hover */
+.offcanvas-close-out:hover{
+  background:  rgba(209, 23, 23, 0.507);
+  transform: translateY(-1px);
+  transition: .2s;
+  color: #fff
+}
+
+@media (max-width: 992px){
+  .main-content{
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+@media (max-width: 576px){
+  .panel-card{
+    box-shadow: 0 10px 26px rgba(15,23,42,.08);
+  }
+}

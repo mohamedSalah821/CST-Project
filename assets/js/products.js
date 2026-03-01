@@ -47,6 +47,7 @@
 import { db } from "./firebase.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { addToCart, showToast } from "./cart.js";
+import { initWishHearts } from "./wishlist.js";
 
 window.addToCartById = function (productId) {
   const product = allProducts.find((p) => p.id === productId);
@@ -186,9 +187,18 @@ function displayProducts(productsList) {
                             </div>
                         </div>
                         
-                        <button onclick="window.addToCartById('${product.id}')" class="btn btn-add-cart rounded-3 px-3 py-2" title="Add to Cart">
+                        <div class="d-flex gap-2">
+                          <button
+                            class="wish-btn"
+                            data-pid="${product.id}"
+                            onclick="window.toggleWishHeart(this,'${product.id}')"
+                            title="Add to Wishlist">
+                            <i class="fa-regular fa-heart"></i>
+                          </button>
+                          <button onclick="window.addToCartById('${product.id}')" class="btn btn-add-cart rounded-3 px-3 py-2" title="Add to Cart">
                             <i class="fa fa-shopping-cart"></i>
-                        </button>
+                          </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -303,6 +313,7 @@ function loadProductsFromFirebase() {
         renderCategories();
         renderCarousel(allProducts);
         displayProducts(allProducts);
+        initWishHearts(); // mark already-wishlisted hearts
       } else {
         document.getElementById("productsContainer").innerHTML = `<div class="col-12 text-center py-5"><h3>No products found!</h3></div>`;
         document.getElementById("saleCarousel").classList.add("d-none");

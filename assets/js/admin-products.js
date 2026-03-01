@@ -1,9 +1,23 @@
 import { db } from './firebase.js';
 import { ref, remove, update, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const cloudName = "dtw2jaesz";
 const uploadPreset = "seller";
+
+// ✅ إضافة: Array للمنتجات المحددة
+let selectedProducts = new Set();
+
+document.addEventListener('DOMContentLoaded', () => {
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        timeOut: 3000
+    };
+
+    initProducts(); 
+});
 
 let allProducts = {};
 let currentFilter = 'all';
@@ -32,6 +46,7 @@ function setupRealtimeListeners() {
                     userId: userId,
                     name: product.name || 'Unnamed Product',
                     category: product.category || 'General',
+                    description: product.description || '', 
                     price: Number(product.price || 0),
                     quantity: Number(product.quantity || 0),
                     imageUrl: product.imageUrl || 'https://via.placeholder.com/150',
@@ -68,7 +83,8 @@ function displayProducts(filteredList) {
     if (!tbody) return;
 
     if (filteredList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4">No products found</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4">No products found</td></tr>`;
+        updateBulkActionsUI();
         return;
     }
 
@@ -76,6 +92,7 @@ function displayProducts(filteredList) {
         const quantity = Number(product.quantity || 0);
         const isOutOfStock = quantity <= 0;
         const isFlagged = product.flagged || false;
+        const isSelected = selectedProducts.has(product.id);
 
         const statusBadge = isFlagged 
             ? '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">⚠️ Flagged</span>'
@@ -91,12 +108,19 @@ function displayProducts(filteredList) {
 
         return `
             <tr ${isFlagged ? 'class="product-flagged"' : ''}>
+                <td class="text-center">
+                    <input type="checkbox" 
+                           class="form-check-input product-checkbox" 
+                           data-product-id="${product.id}"
+                           ${isSelected ? 'checked' : ''}
+                           onchange="toggleProductSelection('${product.id}')">
+                </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         ${product.imageUrl 
                             ? `<img src="${product.imageUrl}" alt="${product.name}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">`
                             : `<div style="width:50px;height:50px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="bi bi-image text-muted"></i></div>`}
-                        <div><div class="fw-semibold">${product.name}</div></div>
+                        <div><div class="fw-semibold">${product.name && product.name.length > 25 ? product.name.substring(0, 25) + "..." : product.name || "Unnamed Product"}</div></div>
                     </div>
                 </td>
                 <td><span class="badge bg-light text-dark border">${product.category}</span></td>
@@ -114,22 +138,200 @@ function displayProducts(filteredList) {
             </tr>
         `;
     }).join('');
+
+    updateBulkActionsUI();
 }
 
+window.selectAllProducts = function() {
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    
+    if (selectAllCheckbox.checked) {
+        checkboxes.forEach(cb => {
+            const productId = cb.dataset.productId;
+            selectedProducts.add(productId);
+            cb.checked = true;
+        });
+    } else {
+        selectedProducts.clear();
+        checkboxes.forEach(cb => cb.checked = false);
+    }
+    
+    updateBulkActionsUI();
+};
+
+window.toggleProductSelection = function(productId) {
+    if (selectedProducts.has(productId)) {
+        selectedProducts.delete(productId);
+    } else {
+        selectedProducts.add(productId);
+    }
+    
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const totalCheckboxes = document.querySelectorAll('.product-checkbox').length;
+    
+    if (selectAllCheckbox) {
+        if (selectedProducts.size === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (selectedProducts.size === totalCheckboxes) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true; 
+        }
+    }
+    
+    updateBulkActionsUI();
+};
+
+function updateBulkActionsUI() {
+    const count = selectedProducts.size;
+    const bulkActions = document.getElementById('bulkActionsBar');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    if (bulkActions && selectedCount) {
+        if (count > 0) {
+            bulkActions.style.display = 'flex';
+            selectedCount.textContent = count;
+        } else {
+            bulkActions.style.display = 'none'; 
+            selectedCount.textContent = '0';
+        }
+    }
+}
+
+window.bulkDeleteProducts = async function() {
+    if (selectedProducts.size === 0) {
+        toastr.warning('⚠️ Please select products first');
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to delete ${selectedProducts.size} product(s)?`)) return;
+
+    try {
+        const promises = [];
+        selectedProducts.forEach(id => {
+            const product = allProducts[id];
+            if (product) {
+                promises.push(remove(ref(db, `seller-products/${product.userId}/${id}`)));
+            }
+        });
+
+        await Promise.all(promises);
+        
+        selectedProducts.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ ${promises.length} product(s) deleted successfully!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error deleting products');
+    }
+};
+
+window.bulkFlagProducts = async function() {
+    if (selectedProducts.size === 0) {
+        toastr.warning('⚠️ Please select products first');
+        return;
+    }
+
+    try {
+        const promises = [];
+        selectedProducts.forEach(id => {
+            const product = allProducts[id];
+            if (product) {
+                promises.push(update(ref(db, `seller-products/${product.userId}/${id}`), {
+                    flagged: true,
+                    updatedAt: Date.now()
+                }));
+            }
+        });
+
+        await Promise.all(promises);
+        
+        selectedProducts.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ ${promises.length} product(s) flagged!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error flagging products');
+    }
+};
+
+window.bulkUnflagProducts = async function() {
+    if (selectedProducts.size === 0) {
+        toastr.warning('⚠️ Please select products first');
+        return;
+    }
+
+    try {
+        const promises = [];
+        selectedProducts.forEach(id => {
+            const product = allProducts[id];
+            if (product) {
+                promises.push(update(ref(db, `seller-products/${product.userId}/${id}`), {
+                    flagged: false,
+                    updatedAt: Date.now()
+                }));
+            }
+        });
+
+        await Promise.all(promises);
+        
+        selectedProducts.clear();
+        
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        
+        toastr.success(`✅ ${promises.length} product(s) unflagged!`);
+        updateBulkActionsUI();
+    } catch (e) {
+        console.error(e);
+        toastr.error('❌ Error unflagging products');
+    }
+};
+
+// 1. الدالة نظيفة فقط للفلترة والبحث
 function applyFiltersAndSearch() {
     const searchTerm = document.getElementById('searchProduct')?.value.toLowerCase().trim() || '';
     let filtered = Object.values(allProducts);
 
+    // تطبيق فلاتر الحالة
     if (currentFilter === 'active') filtered = filtered.filter(p => !p.flagged && p.quantity > 0);
     if (currentFilter === 'flagged') filtered = filtered.filter(p => p.flagged);
     if (currentFilter === 'outofstock') filtered = filtered.filter(p => p.quantity <= 0);
 
+    // تطبيق البحث
     if (searchTerm) {
-        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm));
+        filtered = filtered.filter(p => 
+            (p.name || '').toLowerCase().includes(searchTerm) || 
+            (p.category || '').toLowerCase().includes(searchTerm)
+        );
     }
 
     displayProducts(filtered);
 }
+
+// 2. ربط الحدث (يُنفذ مرة واحدة فقط عند تشغيل الملف)
+document.getElementById('searchProduct')?.addEventListener('input', applyFiltersAndSearch);
 
 window.viewProduct = function(id) {
     const product = allProducts[id];
@@ -143,10 +345,17 @@ window.viewProduct = function(id) {
                         <h5 class="modal-title">Product Details</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        ${product.imageUrl ? `<img src="${product.imageUrl}" class="img-fluid rounded mb-3" alt="${product.name}">` : '<div class="bg-light rounded p-5 text-center mb-3"><i class="bi bi-image fs-1 text-muted"></i></div>'}
-                        <h4>${product.name}</h4>
+                    <div class="modal-body text-center">
+                         ${product.imageUrl ? 
+                        `<img src="${product.imageUrl}" 
+                            style="width:250px;height:250px;object-fit:cover;" 
+                            class="img-fluid rounded mb-3" 
+                            alt="${product.name}">` 
+                        : 
+                        '<div class="bg-light rounded p-5 text-center mb-3"><i class="bi bi-image fs-1 text-muted"></i></div>'}
+                        <h4>${product.name && product.name.length > 25 ? product.name.substring(0, 25) + "..." : product.name || "Unnamed Product"}</h4>
                         <p class="text-muted">${product.category}</p>
+                        <p class="text-muted">${product.description || "No description available"}</p>
                         <hr>
                         <div class="row">
                             <div class="col-6"><strong>Price:</strong> <span class="text-success">$${product.price.toFixed(2)}</span></div>
@@ -172,8 +381,8 @@ window.viewProduct = function(id) {
     modal.show();
     document.getElementById('viewProductModal').addEventListener('hidden.bs.modal', function () { this.remove(); });
 };
-async function uploadToCloudinary(file) {
 
+async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", uploadPreset);
@@ -194,13 +403,13 @@ async function uploadToCloudinary(file) {
 
     return data.secure_url;
 }
-window.addProduct = async function() {
 
+window.addProduct = async function() {
     const nameEl = document.getElementById('productName');
     const categoryEl = document.getElementById('productCategory');
     const priceEl = document.getElementById('productPrice');
     const stockEl = document.getElementById('productStock');
-    const imageFileEl = document.getElementById('productImageFile'); // 👈 بدل URL
+    const imageFileEl = document.getElementById('productImageFile');
     const addModalEl = document.getElementById('addProductModal');
 
     const userId = 'defaultUser';
@@ -212,14 +421,13 @@ window.addProduct = async function() {
     const file = imageFileEl?.files[0];
 
     if (!name || !category || price <= 0) {
-        return alert('Please enter valid product data.');
+        toastr.error('❌ Please enter valid product data.');
+        return;
     }
 
     try {
-
         let imageUrl = "https://via.placeholder.com/150";
 
-        // ✅ لو في صورة ارفعها على Cloudinary
         if (file) {
             imageUrl = await uploadToCloudinary(file);
         }
@@ -245,13 +453,14 @@ window.addProduct = async function() {
         modalInstance.hide();
         document.getElementById('addProductForm').reset();
 
-        alert('✅ Product added successfully!');
+        toastr.success('✅ Product added successfully!');
 
     } catch (e) {
         console.error(e);
-        alert('❌ Error adding product: ' + e.message);
+        toastr.error('❌ Error adding product: ' + e.message);
     }
 };
+
 window.deleteProduct = async function(id) {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
@@ -259,8 +468,8 @@ window.deleteProduct = async function(id) {
         const product = allProducts[id];
         if (!product) return;
         await remove(ref(db, `seller-products/${product.userId}/${id}`));
-        alert('Product deleted successfully!');
-    } catch (e) { console.error(e); alert('Error deleting product'); }
+        toastr.success('✅ Product deleted successfully!');
+    } catch (e) { console.error(e); toastr.error('❌ Error deleting product'); }
 };
 
 window.toggleFlag = async function(id, currentStatus) {
@@ -268,7 +477,7 @@ window.toggleFlag = async function(id, currentStatus) {
         const product = allProducts[id];
         if (!product) return;
         await update(ref(db, `seller-products/${product.userId}/${id}`), { flagged: !currentStatus, updatedAt: Date.now() });
-    } catch (e) { console.error(e); alert('Error updating product'); }
+    } catch (e) { console.error(e); toastr.error('❌ Error updating product'); }
 };
 
 window.filterProducts = function(type) {
@@ -279,19 +488,33 @@ window.filterProducts = function(type) {
     applyFiltersAndSearch();
 };
 
-document.getElementById('searchProduct')?.addEventListener('input', applyFiltersAndSearch);
 
-function setupMobileSidebar() {
-    const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
 
-    if (sidebarToggle && sidebar && sidebarOverlay) {
-        sidebarToggle.addEventListener('click', e => { e.stopPropagation(); sidebar.classList.toggle('show'); sidebarOverlay.classList.toggle('show'); });
-        sidebarOverlay.addEventListener('click', () => { sidebar.classList.remove('show'); sidebarOverlay.classList.remove('show'); });
-        sidebar.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => { if(window.innerWidth<=768){sidebar.classList.remove('show'); sidebarOverlay.classList.remove('show');}}));
-        document.addEventListener('keydown', e => { if(e.key==='Escape' && sidebar.classList.contains('show')){sidebar.classList.remove('show'); sidebarOverlay.classList.remove('show');} });
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('active');
+        });
     }
-}
 
-document.addEventListener('DOMContentLoaded', initProducts);
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('active');
+        });
+    }
+
+/* 🚪 EVENT LOGOUT
+=========================== */
+window.logout = function(e) {
+    if (e) e.preventDefault(); 
+
+    localStorage.removeItem('admin_session');
+    
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.replace("../../login.html");
+};

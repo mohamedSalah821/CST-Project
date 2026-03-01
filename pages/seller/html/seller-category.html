@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Categories</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="./../css/sidebar.css">
+
+  <style>
+   body { background:#f5f7fa; }
+
+.card { border:0; border-radius:16px; }
+
+.page-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.main-content h2{
+  
+    font-weight: 700;
+    font-size: 40px;
+    color: #5b6ee7;
+    line-height: 1.1;
+
+}
+.card-soft{ background: #ffffff; }
+
+.input-soft .form-control,
+.input-soft .input-group-text{
+  border-color:#e9edf5;
+}
+
+.hint-box{
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 10px 12px;
+  color:#334155;
+  font-size: 13px;
+}
+
+.table thead th{
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color:#64748b;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.table tbody td{
+  border-top: 1px solid #eef2f7;
+}
+
+.cat-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background:#eef2ff;
+  color:#3730a3;
+  font-weight:600;
+  font-size: 13px;
+}
+
+.cat-pill i{
+  font-size: 12px;
+  opacity: .85;
+}
+
+.count-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width: 38px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+.icon-btn{
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background:#fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition: .15s ease;
+}
+
+.icon-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, .08);
+}
+
+.icon-btn.edit{
+  border-color: rgba(59,130,246,.25);
+  color:#2563eb;
+}
+
+.icon-btn.del{
+  border-color: rgba(239,68,68,.25);
+  color:#ef4444;
+}
+
+.icon-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+.btn-grad{
+  border:0;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  transition: .15s ease;
+}
+
+.btn-grad:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+
+.row-disabled{
+  background: #f1f8ff;
+  opacity: .9;
+}
+
+.row-disabled td{
+  color:#20129f;
+  
+}
+
+  </style>
+</head>
+
+<body>
+  <div id="sidebar-container"></div>
+
+ <main class="main-content p-4">
+    <div class="page-head mb-3">
+      <div>
+        <h2 class="mb-1">Manage Categories</h2>
+        <div class="text-muted small">Here you can handle categories easily</div>
+      </div>
+
+      <a class="btn btn-light border rounded-pill px-3" href="./seller-products.html">
+        <i class="fa-solid fa-arrow-left me-2"></i>Back
+      </a>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="card card-soft shadow-sm p-3 mb-3">
+      <div class="row g-2 align-items-end">
+
+        <div class="col-12 col-md-5">
+          <label class="form-label small text-muted mb-1">Search</label>
+          <div class="input-group input-soft">
+            <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input id="catSearchInput" type="text" class="form-control" placeholder="Search category name..." />
+          </div>
+        </div>
+
+        <div class="col-12 col-md-5">
+          <label class="form-label small text-muted mb-1">New Category</label>
+          <input id="newCategoryInput" type="text" class="form-control" placeholder="e.g. clothes, electronics..." />
+        </div>
+
+        <div class="col-12 col-md-2 d-grid">
+          <button id="addCategoryBtn" class="btn btn-primary btn-grad">
+            <i class="fa-solid fa-plus me-2"></i>Add
+          </button>
+        </div>
+
+        <div class="col-12 mt-2">
+          <div class="hint-box">
+            <i class="fa-solid fa-circle-info me-2"></i>
+            You can’t delete a category if it’s used by products. Remove/reassign products first.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card shadow-sm p-3">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="width:45%;">Category</th>
+              <th style="width:15%;">Products</th>
+              <th class="text-end" style="width:20%;">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="categoriesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1080;">
+      <div id="appToast" class="toast align-items-center text-white bg-dark border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body" id="toastText">Done</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+  <script type="module" src="../js/seller-categories.js"></script>
+  <script type="module">
+    fetch("sidebar.html")
+      .then(res => res.text())
+      .then(async (data) => {
+        document.getElementById("sidebar-container").innerHTML = data;
+
+        // ✅ بعد ما sidebar يتحط، حمّل سكربت الحساب
+        const mod = await import("./../js/sidebar-account.js");
+        await mod.initSidebarAccount();
+      });
+  </script>
+</body>
+</html>
