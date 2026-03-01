@@ -12,7 +12,7 @@
 </head>
 <body>
 
-        <!-- Sidebar -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <i class="bi bi-speedometer2"></i>
@@ -34,9 +34,9 @@
                 <i class="bi bi-people"></i>
                 <span>Users</span>
             </a>
-                <a class="nav-link active " href="./customer.html">
-                    <i class="bi bi-chat-dots"></i> Customer Service
-                </a>
+            <a class="nav-link active " href="./customer.html">
+                <i class="bi bi-chat-dots"></i> Customer Service
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -45,10 +45,10 @@
                 <span>My Profile</span>
             </a>
 
-        <a href="#" onclick="logout(event)" class="nav-link logout">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-         </a>
+            <a href="#" onclick="logout(event)" class="nav-link logout">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
         </div>
     </aside>
 
@@ -60,17 +60,16 @@
         <button class="sidebar-toggle d-md-none" id="sidebarToggle">
             <i class="bi bi-list"></i>
         </button>
-  <!-- Page Header -->
-            <header class="page-header py-3">
-                <div>
-                    <h2 class="mb-1">Customer Service</h2>
-                    <p class="text-muted mb-0">Manage customer messages and inquiries</p>
-                </div>
-            </header> 
+
+        <!-- Page Header -->
+        <header class="page-header py-3">
+            <div>
+                <h2 class="mb-1">Customer Service</h2>
+                <p class="text-muted mb-0">Manage customer messages and inquiries</p>
+            </div>
+        </header>
 
         <div class="container-fluid px-4 py-4">
-            
-          
 
             <!-- Stats Cards -->
             <div class="row g-4 mb-4">
@@ -140,16 +139,16 @@
                     </button>
                 </div>
             </div>
-            
-                    <div class="mb-3 d-flex align-items-center gap-2">
-                        <input type="checkbox" 
-                            class="form-check-input" 
-                            id="selectAllCheckbox" 
-                            onchange="selectAllMessages()">
-                        <label for="selectAllCheckbox" class="form-check-label">
-                            Select All
-                        </label>
-                    </div>
+
+            <div class="mb-3 d-flex align-items-center gap-2">
+                <input type="checkbox" 
+                    class="form-check-input" 
+                    id="selectAllCheckbox" 
+                    onchange="selectAllMessages()">
+                <label for="selectAllCheckbox" class="form-check-label">
+                    Select All
+                </label>
+            </div>
 
             <!-- Filter Tabs -->
             <div class="filter-tabs">
@@ -165,7 +164,7 @@
             </div>
 
             <!-- Search Bar -->
-            <div class="mb-4">
+            <div class="mb-4 mt-3">
                 <input type="text" 
                        class="form-control" 
                        id="searchMessage" 
@@ -177,6 +176,37 @@
                 <!-- Messages will be loaded here -->
             </div>
 
+        </div>
+    </div>
+
+    <!-- ✅ Reply Modal (في مكانه الصح خارج الـ container) -->
+    <div class="modal fade" id="replyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-reply me-2"></i>Reply to Message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">To: <strong id="replyToEmail"></strong></p>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" id="replySubject" class="form-control" 
+                               value="Re: Your message to us">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea id="replyBody" class="form-control" rows="5" 
+                                  placeholder="Write your reply..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                   <button class="btn btn-primary" id="sendReplyBtn">
+                        <i class="bi bi-send me-1"></i>Send Reply
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
