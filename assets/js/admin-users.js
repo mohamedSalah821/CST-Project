@@ -498,17 +498,13 @@ document.addEventListener('DOMContentLoaded', function() {
 /* 🚪 EVENT LOGOUT
 =========================== */
 window.logout = function(e) {
-    if (e) e.preventDefault(); // منع الرابط من تحديث الصفحة
+    if (e) e.preventDefault(); 
 
-    // 1. مسح السيشن اليدوي
     localStorage.removeItem('admin_session');
     
-    // 2. تأكيد المسح لكل شيء احتياطياً
     localStorage.clear();
     sessionStorage.clear();
 
-    console.log("Logged out successfully");
 
-    // 3. التوجيه الفوري
     window.location.replace("../../login.html");
 };

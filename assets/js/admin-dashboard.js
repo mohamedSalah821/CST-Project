@@ -254,7 +254,7 @@ function renderMostSoldTable(productSales) {
         return `
             <tr>
                 <td>${index + 1}</td>
-                <td class="fw-bold">${product.name}</td>
+                <td class="fw-bold">${product.name && product.name.length > 25 ? product.name.substring(0, 25) + "..." : product.name || "Unnamed Product"}</td>
                 <td><span class="badge bg-light text-dark border">${product.category}</span></td>
                 <td>$${Number(product.price).toFixed(2)}</td>
                 <td class="fw-bold text-primary">${count}</td>

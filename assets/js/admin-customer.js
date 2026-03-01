@@ -1,11 +1,16 @@
 import { db, auth } from './firebase.js';
 import { ref, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm';
 
 let allMessages = {};
 let currentFilter = 'all';
 let selectedMessages = new Set();
+let currentReplyData = {};
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ✅ emailjs.init هنا جوه DOMContentLoaded عشان يشتغل صح
+    emailjs.init("nS-LCttWLiId737aQ"); // ← حط الـ Public Key بتاعك هنا
+
     toastr.options = {
         closeButton: true,
         progressBar: true,
@@ -127,6 +132,10 @@ function displayMessages(messages) {
             }
         }
 
+        // ✅ escape الداتا عشان متكسرش الـ HTML لو في quotes في الاسم أو الإيميل
+        const safeName = (msg.name || 'Anonymous').replace(/'/g, "\\'");
+        const safeEmail = (msg.email || '').replace(/'/g, "\\'");
+
         return `
             <div class="message-card ${isRead ? 'read' : ''}">
                 <div class="message-header">
@@ -165,6 +174,12 @@ function displayMessages(messages) {
                             <i class="bi bi-envelope me-1"></i>Mark as Unread
                         </button>`
                     }
+                    
+                    <!-- ✅ زرار Reply جوه كل message card -->
+                    <button onclick="replyToMessage('${msg.id}', '${safeEmail}', '${safeName}')" class="btn btn-sm btn-primary">
+                        <i class="bi bi-reply me-1"></i>Reply
+                    </button>
+
                     <button onclick="deleteMessage('${msg.id}')" class="btn btn-sm btn-outline-danger">
                         <i class="bi bi-trash me-1"></i>Delete
                     </button>
@@ -175,6 +190,53 @@ function displayMessages(messages) {
 
     updateBulkActionsUI();
 }
+
+/* ===========================
+   📧 REPLY FUNCTIONS
+=========================== */
+window.replyToMessage = function(messageId, email, name) {
+    currentReplyData = { messageId, email, name };
+    document.getElementById('replyToEmail').textContent = `${name} By email <${email}>`;
+    document.getElementById('replyBody').value = '';
+    new bootstrap.Modal(document.getElementById('replyModal')).show();
+};
+
+window.sendReply = async function() {
+    const subject = document.getElementById('replySubject').value.trim();
+    const body = document.getElementById('replyBody').value.trim();
+
+    if (!body) {
+        toastr.warning('⚠️ Please write a reply first');
+        return;
+    }
+
+    const sendBtn = document.querySelector('#replyModal .btn-primary');
+    const originalHTML = sendBtn.innerHTML;
+    sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sending...';
+    sendBtn.disabled = true;
+
+    try {
+        await emailjs.send("service_9tszh71", "template_1nej7un", {
+            to_email: currentReplyData.email,
+            to_name: currentReplyData.name,
+            subject: subject,
+            message: body,
+        });
+
+        // ✅ بعد الإرسال، اعمله mark as read تلقائي
+        await markAsRead(currentReplyData.messageId);
+
+        bootstrap.Modal.getInstance(document.getElementById('replyModal')).hide();
+        toastr.success('✅ Reply sent successfully!');
+    } catch (error) {
+        console.error(error);
+        toastr.error('❌ Failed to send reply. Check your EmailJS settings.');
+    } finally {
+        // ✅ رجّع الزرار لحالته الأصلية
+        sendBtn.innerHTML = originalHTML;
+        sendBtn.disabled = false;
+    }
+};
 
 /* ===========================
    📋 MESSAGE ACTIONS
@@ -224,7 +286,6 @@ window.selectAllMessages = function() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     
     if (selectAllCheckbox && selectAllCheckbox.checked) {
-        // تحديد الكل
         checkboxes.forEach(cb => {
             const messageId = cb.dataset.messageId;
             selectedMessages.add(messageId);
@@ -376,6 +437,9 @@ window.bulkDeleteMessages = async function() {
         toastr.error('❌ Failed to delete messages');
     }
 };
+document.getElementById('sendReplyBtn')?.addEventListener('click', sendReply);
+window.sendReply = sendReply;
+window.replyToMessage = replyToMessage;
 
 /* ===========================
    🔍 FILTER & SEARCH
@@ -410,6 +474,7 @@ function setupMobileSidebar() {
         });
     }
 }
+
 /* 🚪 EVENT LOGOUT
 =========================== */
 window.logout = function(e) {
