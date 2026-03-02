@@ -34,7 +34,7 @@ if (savedUser && savedUser.role) {
   } else if (savedUser.role === "seller") {
     window.location.href = "../../../pages/seller/html/seller-dashboard.html";
   } else {
-    window.location.href = "../../../pages/customer/customer-products.html";
+    window.location.href = "../../../index.html";
   }
 }
 
@@ -186,7 +186,7 @@ loginForm.addEventListener("submit", async (e) => {
       } else if (user.role === "seller") {
         window.location.href = "../../../../pages/seller/html/seller-dashboard.html";
       } else {
-        window.location.href = "../../../pages/customer/customer-products.html";
+        window.location.href = "../../../index.html";
       }
     }, 1500);
 
