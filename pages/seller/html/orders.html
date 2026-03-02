@@ -10,6 +10,7 @@
 
   <link rel="stylesheet" href="./../css/sidebar.css">
   <link rel="stylesheet" href="./../css/orders.css">
+  <link rel="stylesheet" href="./../../../assets/css/footer.css">
 </head>
 
 <body>
@@ -171,6 +172,9 @@
     </div>
   </div>
 
+      <div id="footer-placeholder" style="width: 82%; position: absolute; right: 0px;" ></div>
+
+
      <script src="../../../assets/js/Auth/guard.js"></script>
 
 
@@ -190,6 +194,10 @@
     });
 </script>
  <script type="module" src="../js/seller-order.js"></script>
+ <script src="../../../assets/js/footer.js"></script>
+<script>
+    loadFooter("../../../")
+</script>
    
  <script>
   requireAuth(["seller"]);

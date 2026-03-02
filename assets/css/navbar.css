@@ -8,35 +8,21 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-light-gray);
+    padding-top: 80px; 
 }
 
+nav{
+    z-index: 1000;
+    top: 0px !important;
+}
 /* --- Navbar Styles --- */
 .custom-navbar {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
-/* Search Bar Wrapper */
-.search-wrapper {
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: white;
-    transition: border-color 0.3s ease;
-}
-
-.search-wrapper:focus-within {
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
-}
-
-.search-wrapper .form-control, 
-.search-wrapper .input-group-text {
-    background: transparent;
-}
-
 /* Active Nav Links */
 .navbar-nav .nav-link {
-    border-bottom: 2px solid transparent; /* مساحة مخفية لتجنب تحرك الكلمات */
+    border-bottom: 2px solid transparent;
     transition: all 0.2s ease;
 }
 

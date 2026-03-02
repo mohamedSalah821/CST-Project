@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Admin Profile</title>
+    <title>Admin Profile | ShopFlow</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -49,11 +49,15 @@
             cursor: pointer; color: #667eea; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .profile-body { padding: 40px; }
+        
+        /* التعديل هنا: تظبيط الخط والمسافة لليسار */
         .section-title {
             font-size: 1.1rem; font-weight: 700; color: #4a5568;
             margin-bottom: 25px; display: flex; align-items: center;
-            border-right: 4px solid #764ba2; padding-right: 15px;
+            border-left: 4px solid #764ba2; 
+            padding-left: 15px; 
         }
+        
         .form-control {
             border-radius: 12px; padding: 12px 18px;
             border: 1.5px solid #e2e8f0; background: #f8fafc;
@@ -75,6 +79,7 @@
             background: #edf2f7; border-radius: 12px; padding: 12px 18px; color: #718096;
         }
     </style>
+    <link rel="stylesheet" href="../../assets/css/footer.css">
 </head>
 <body>
 
@@ -93,49 +98,57 @@
                 <input type="file" id="uploadImg" hidden accept="image/*">
             </div>
             <h1 class="profile-name h3 mb-1" id="adminNameDisplay">Loading...</h1>
-            <p class="opacity-75 mb-3"> System Administrator</p>
+            <p class="opacity-75 mb-3">System Administrator</p>
             <div id="uploadStatus"></div>
-            <button class="btn btn-light btn-sm rounded-pill px-4" onclick="window.history.back()">
-                <i class="bi bi-arrow-right ms-2"></i>Back to Dashboard
+            
+            <button class="btn btn-light btn-sm rounded-pill px-4 mt-2" onclick="window.history.back()">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
             </button>
         </div>
 
         <div class="profile-body">
             <form id="profileForm">
-                <div class="section-title">Account information</div>
+                <div class="section-title">Account Information</div>
                 <div class="mb-4">
-                    <label class="form-label small fw-bold text-muted">  email </label>
+                    <label class="form-label small fw-bold text-muted">Email Address</label>
                     <div class="readonly-box" id="adminEmail">loading...</div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label small fw-bold text-muted" for="adminName"> full name</label>
-                    <input type="text" id="adminName" class="form-control" placeholder=" Enter your full name">
+                    <label class="form-label small fw-bold text-muted" for="adminName">Full Name</label>
+                    <input type="text" id="adminName" class="form-control" placeholder="Enter your full name">
                 </div>
 
-                <div class="section-title mt-5">  change password</div>
+                <div class="section-title mt-5">Change Password</div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label small fw-bold text-muted">currentPassword</label>
-                        <input type="password" id="currentPassword" class="form-control" placeholder="********">
+                        <label class="form-label small fw-bold text-muted">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-control" placeholder="••••••••">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label small fw-bold text-muted"> newPassword </label>
-                        <input type="password" id="newPassword" class="form-control" placeholder="Leave blank to keep current password">
+                        <label class="form-label small fw-bold text-muted">New Password</label>
+                        <input type="password" id="newPassword" class="form-control" placeholder="Leave blank to keep current">
                     </div>
                 </div>
 
                 <div class="text-center mt-5">
                     <button type="submit" class="btn btn-save">
-                        <i class="bi bi-shield-check me-2"></i> sasve changes
+                        <i class="bi bi-shield-check me-2"></i> Save Changes
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<div id="footer-placeholder"></div>
+
 <script src="../../assets/js/Auth/guard.js"></script>
 <script type="module" src="../../assets/js/admin-profile.js"></script>
+<script src="../../assets/js/footer.js"></script>
+<script>
+    loadFooter("../../")
+</script>
 <script>
   requireAuth(["admin"]);
 </script>
