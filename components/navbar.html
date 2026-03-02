@@ -2,12 +2,9 @@
   class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3 custom-navbar"
 >
   <div class="container px-4 align-items-center">
-    <a
-      class="navbar-brand d-flex align-items-center fw-bold fs-4 text-dark"
-      href="{{root}}index.html"
-    >
-      <i class="fas fa-cube text-primary me-2"></i> ShopFlow
-    </a>
+  <a class="navbar-brand d-flex align-items-center" href="{{root}}index.html">
+  <img width="120px" height="100px" src="{{root}}/components/logo.png" alt="ShopFlow Logo" class="logo-img">
+</a>
 
     <button
       class="navbar-toggler"
@@ -19,18 +16,6 @@
     </button>
 
     <div class="collapse navbar-collapse" id="mainNavbarContent">
-      <form class="mx-auto my-2 my-lg-0 w-100" style="max-width: 500px">
-        <div class="input-group search-wrapper">
-          <span class="input-group-text bg-white text-muted border-end-0 px-3">
-            <i class="fas fa-search"></i>
-          </span>
-          <input
-            type="text"
-            class="form-control border-start-0 ps-0 shadow-none"
-            placeholder="Search products..."
-          />
-        </div>
-      </form>
 
       <ul
         class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0"
@@ -42,6 +27,7 @@
             >Catalog</a
           >
         </li>
+
         <li class="nav-item">
           <a
             id="wishlist-nav-link"
@@ -49,9 +35,10 @@
             href="{{root}}pages/customer/wishlist.html"
           >
             <i class="fa-regular fa-heart me-2 fs-5"></i> Wishlist
-            <span class="wish-nav-badge"> 0 </span>
+            <span class="wish-nav-badge">  </span>
           </a>
         </li>
+
         <li class="nav-item">
           <a
             class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
@@ -80,6 +67,23 @@
           </a>
         </li>
 
+        <li class="nav-item">
+          <a
+            class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
+            href="{{root}}pages/contact-us/contact.html"
+          >
+            <i class="fas fa-envelope me-2 fs-5"></i> Contact Us
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
+            href="{{root}}pages/About-Us/about.html"
+          > About Us
+          </a>
+        </li>
+
         <li class="nav-item ms-lg-2">
           <div id="guest-menu" class="d-flex align-items-center gap-3">
             <a href="{{root}}login.html" class="nav-link fw-semibold text-dark"
@@ -87,7 +91,8 @@
             >
             <a
               href="{{root}}register.html"
-              class="btn btn-primary-custom px-4 py-2 rounded-3"
+              class="btn btn-primary px-4 py-2 rounded-3 fw-bold text-white"
+              style="background-color: #007bff; border: none"
               >Register</a
             >
           </div>
@@ -96,18 +101,19 @@
             <a
               href="#"
               id="profile-link"
-              class="nav-link fw-semibold text-dark d-flex align-items-center"
+              class="nav-link fw-semibold text-dark d-flex align-items-center pe-3 border-end"
             >
-              <i class="far fa-user me-2 fs-5"></i>
+              <i class="far fa-user-circle me-2 fs-4 text-primary"></i>
               <span id="display-username">User</span>
             </a>
             <a
               href="#"
               id="logout-btn"
-              class="nav-link text-danger"
+              class="nav-link text-danger d-flex align-items-center fw-bold btn-link"
+              style="cursor: pointer"
               title="Logout"
             >
-              <i class="fas fa-sign-out-alt fs-5"></i>
+              <i class="fas fa-sign-out-alt fs-5 me-1"></i> Logout
             </a>
           </div>
         </li>

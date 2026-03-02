@@ -276,6 +276,59 @@ function setupFilters() {
 // ==========================================
 // 4. getting data from firebase and initialize the page
 // ==========================================
+// function loadProductsFromFirebase() {
+//   const productsRef = ref(db, "seller-products");
+
+//   onValue(productsRef, (snapshot) => {
+//       allProducts = [];
+
+//       if (snapshot.exists()) {
+//         const fbData = snapshot.val();
+
+//         for (const sellerId in fbData) {
+//           const sellerProducts = fbData[sellerId];
+//           for (const productId in sellerProducts) {
+//             const p = sellerProducts[productId];
+            
+//             // ===== if the product is flagged then neglect it & continue   =====
+//     if (p.flagged === true || p.flagged === "true") continue;           
+//  // ================================
+
+//             allProducts.push({
+//               id: productId,
+//               sellerId: sellerId,
+//               name: p.name,
+//               description: p.description,
+//               price: p.price,
+//               priceAfterDiscount: p.priceAfterDiscount,
+//               category: p.category,
+//               imageUrl: p.imageUrl,
+//               quantity: p.quantity,
+//               rating: p.rating,
+//               flagged: p.flagged || false
+//             });
+//           }
+//         }
+
+//         renderCategories();
+//         renderCarousel(allProducts);
+//         displayProducts(allProducts);
+//         initWishHearts(); // mark already-wishlisted hearts
+//       } else {
+//         document.getElementById("productsContainer").innerHTML = `<div class="col-12 text-center py-5"><h3>No products found!</h3></div>`;
+//         document.getElementById("saleCarousel").classList.add("d-none");
+//       }
+//     },
+//     (error) => {
+//       console.error("Firebase read error:", error);
+//     }
+//   );
+// }
+
+
+// ==========================================
+// 4. getting data from firebase and initialize the page
+// ==========================================
 function loadProductsFromFirebase() {
   const productsRef = ref(db, "seller-products");
 
@@ -290,9 +343,26 @@ function loadProductsFromFirebase() {
           for (const productId in sellerProducts) {
             const p = sellerProducts[productId];
             
-            // ===== if the product is flagged then neglect it & continue   =====
-    if (p.flagged === true || p.flagged === "true") continue;           
- // ================================
+            // ===== تجاهل المنتجات الموقوفة =====
+            if (p.flagged === true || p.flagged === "true") continue;           
+
+            // =========================================================
+            // ✅ توحيد شكل الداتا (Data Normalization) عشان نحل الاختلافات
+            // =========================================================
+            
+            // 1. حل مشكلة اسم الكاتيجوري
+            const finalCategory = p.categoryName || p.category || "Uncategorized";
+            
+            // 2. حل مشكلة الصور (لو باعت مصفوفة صور ناخد أول صورة، لو باعت صورة واحدة ناخدها)
+            let finalImage = "https://via.placeholder.com/300x300?text=No+Image";
+            if (p.imageUrls && Array.isArray(p.imageUrls) && p.imageUrls.length > 0) {
+                finalImage = p.imageUrls[0]; // بناخد أول صورة من الـ Array
+            } else if (p.imageUrl) {
+                finalImage = p.imageUrl;
+            }
+
+            // 3. حل مشكلة الكمية (لو مسميها qty أو quantity)
+            const finalQuantity = p.quantity || p.qty || 0;
 
             allProducts.push({
               id: productId,
@@ -301,10 +371,10 @@ function loadProductsFromFirebase() {
               description: p.description,
               price: p.price,
               priceAfterDiscount: p.priceAfterDiscount,
-              category: p.category,
-              imageUrl: p.imageUrl,
-              quantity: p.quantity,
-              rating: p.rating,
+              category: finalCategory, // استخدمنا المتغير المتوحد
+              imageUrl: finalImage,    // استخدمنا الصورة المتوحدة
+              quantity: finalQuantity, // استخدمنا الكمية المتوحدة
+              rating: p.rating || 4.5,
               flagged: p.flagged || false
             });
           }
@@ -313,10 +383,13 @@ function loadProductsFromFirebase() {
         renderCategories();
         renderCarousel(allProducts);
         displayProducts(allProducts);
-        initWishHearts(); // mark already-wishlisted hearts
+        if (typeof initWishHearts === "function") {
+            initWishHearts(); // mark already-wishlisted hearts
+        }
       } else {
         document.getElementById("productsContainer").innerHTML = `<div class="col-12 text-center py-5"><h3>No products found!</h3></div>`;
-        document.getElementById("saleCarousel").classList.add("d-none");
+        const carousel = document.getElementById("saleCarousel");
+        if(carousel) carousel.classList.add("d-none");
       }
     },
     (error) => {
