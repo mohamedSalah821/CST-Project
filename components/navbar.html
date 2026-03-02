@@ -1,10 +1,11 @@
 <nav
-  class="navbar navbar-expand-lg navbar-light bg-white border-bottom  custom-navbar position-fixed w-100"
+  class="navbar navbar-expand-lg navbar-light bg-white border-bottom custom-navbar fixed-top shadow-sm"
 >
   <div class="container px-4 align-items-center">
-  <a class="navbar-brand d-flex align-items-center" href="{{root}}index.html">
-  <img width="120px" height="100px" src="{{root}}/components/logo.png" alt="Logo" class="logo-img">
-</a>
+
+    <a class="navbar-brand d-flex align-items-center" href="{{root}}index.html">
+      <img width="120" height="100" src="{{root}}/components/logo.png" alt="Logo" class="logo-img">
+    </a>
 
     <button
       class="navbar-toggler"
@@ -17,106 +18,87 @@
 
     <div class="collapse navbar-collapse" id="mainNavbarContent">
 
-      <ul
-        class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0"
-      >
-        <li class="nav-item">
-          <a
-            class="nav-link fw-semibold text-dark nav-item-link"
-            href="{{root}}pages/customer/customer-products.html"
-            >Catalog</a
-          >
-        </li>
+      <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4 mt-3 mt-lg-0">
 
         <li class="nav-item">
-          <a
-            id="wishlist-nav-link"
-            class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
-            href="{{root}}pages/customer/wishlist.html"
-          >
-            <i class="fa-regular fa-heart me-2 fs-5"></i> Wishlist
-            <span class="wish-nav-badge">  </span>
+          <a class="nav-link fw-semibold text-dark nav-item-link"
+            href="{{root}}pages/customer/customer-products.html">
+            Catalog
           </a>
         </li>
 
         <li class="nav-item">
-          <a
+          <a id="wishlist-nav-link"
             class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
-            href="{{root}}pages/customer/cart.html"
-          >
-            <i class="fas fa-shopping-cart me-2 fs-5"></i> Cart
-            <span
-              class="cart-nav-badge"
-              style="
-                display: none;
-                position: absolute;
-                top: -6px;
-                right: -10px;
-                background: #007bff;
-                color: #fff;
-                border-radius: 50%;
-                width: 18px;
-                height: 18px;
-                font-size: 0.65rem;
-                font-weight: 700;
-                align-items: center;
-                justify-content: center;
-              "
-              >0</span
-            >
+            href="{{root}}pages/customer/wishlist.html">
+            <i class="fa-regular fa-heart me-2 fs-5"></i>
+            Wishlist
+            <span class="wish-nav-badge"></span>
           </a>
         </li>
 
         <li class="nav-item">
-          <a
-            class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
-            href="{{root}}pages/contact-us/contact.html"
-          >
-            <i class="fas fa-envelope me-2 fs-5"></i> Contact Us
+          <a class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
+            href="{{root}}pages/customer/cart.html">
+            <i class="fas fa-shopping-cart me-2 fs-5"></i>
+            Cart
+            <span class="cart-nav-badge"
+              style="display:none; position:absolute; top:-6px; right:-10px; background:#007bff; color:#fff; border-radius:50%; width:18px; height:18px; font-size:0.65rem; font-weight:700; align-items:center; justify-content:center;">
+              0
+            </span>
           </a>
         </li>
 
         <li class="nav-item">
-          <a
-            class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link position-relative"
-            href="{{root}}pages/About-Us/about.html"
-          > About Us
+          <a class="nav-link fw-semibold text-dark d-flex align-items-center nav-item-link"
+            href="{{root}}pages/contact-us/contact.html">
+            <i class="fas fa-envelope me-2 fs-5"></i>
+            Contact Us
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link fw-semibold text-dark nav-item-link"
+            href="{{root}}pages/About-Us/about.html">
+            About Us
           </a>
         </li>
 
         <li class="nav-item ms-lg-2">
+
+          <!-- Guest -->
           <div id="guest-menu" class="d-flex align-items-center gap-3">
-            <a href="{{root}}login.html" class="nav-link fw-semibold text-dark"
-              >Sign in</a
-            >
-            <a
-              href="{{root}}register.html"
+            <a href="{{root}}login.html" class="nav-link fw-semibold text-dark">
+              Sign in
+            </a>
+
+            <a href="{{root}}register.html"
               class="btn btn-primary px-4 py-2 rounded-3 fw-bold text-white"
-              style="background-color: #007bff; border: none"
-              >Register</a
-            >
+              style="background-color:#007bff; border:none">
+              Register
+            </a>
           </div>
 
+          <!-- User -->
           <div id="user-menu" class="align-items-center gap-3 d-none">
-            <a
-              href="#"
+            <a href="#"
               id="profile-link"
-              class="nav-link fw-semibold text-dark d-flex align-items-center pe-3 border-end"
-            >
+              class="nav-link fw-semibold text-dark d-flex align-items-center pe-3 border-end">
               <i class="far fa-user-circle me-2 fs-4 text-primary"></i>
               <span id="display-username">User</span>
             </a>
-            <a
-              href="#"
+
+            <a href="#"
               id="logout-btn"
               class="nav-link text-danger d-flex align-items-center fw-bold btn-link"
-              style="cursor: pointer"
-              title="Logout"
-            >
-              <i class="fas fa-sign-out-alt fs-5 me-1"></i> Logout
+              style="cursor:pointer">
+              <i class="fas fa-sign-out-alt fs-5 me-1"></i>
+              Logout
             </a>
           </div>
+
         </li>
+
       </ul>
     </div>
   </div>
