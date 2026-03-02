@@ -10,7 +10,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: #ffffff;
     overflow-x: hidden;
-}
+} 
 body::after{
      content:'';
      width:100%;
@@ -27,7 +27,7 @@ body::after{
      animation-duration:2s;
      transform:scale(0);
      border:none
-   }
+   } 
  @keyframes fade-in {
      0% {
        opacity:1;
