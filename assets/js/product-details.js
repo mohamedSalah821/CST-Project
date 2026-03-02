@@ -56,7 +56,7 @@ function renderProduct(p, pId) {
   // تحديث مسار الصفحة
   breadcrumb.innerHTML = `
         <li class="breadcrumb-item"><a href="customer-products.html" class="text-decoration-none">Catalog</a></li>
-        <li class="breadcrumb-item"><span class="text-capitalize">${p.category || "General"}</span></li>
+        <li class="breadcrumb-item"><span class="text-capitalize">${p.category || p.categoryName || "General"}</span></li>
         <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">${(p.name || "Product").substring(0, 30)}...</li>
     `;
 
@@ -82,11 +82,31 @@ function renderProduct(p, pId) {
     priceHtml = `<h2 class="fw-bold text-dark mb-0">$${originalPrice.toFixed(2)}</h2>`;
   }
 
-  // placeholder image logic
-  const mainImg =
-    p.imageUrl || "https://via.placeholder.com/600x600?text=No+Image";
-  const galleryImages =
-    p.gallery && p.gallery.length > 0 ? p.gallery : [mainImg];
+  // ==========================================
+  // placeholder image logic & Data Normalization
+  let galleryImages = [];
+
+  if (p.imageUrl) galleryImages.push(p.imageUrl);
+
+  if (p.gallery && Array.isArray(p.gallery)) {
+    galleryImages = [...galleryImages, ...p.gallery];
+  }
+
+  if (p.imageUrls) {
+    const newImages = Array.isArray(p.imageUrls)
+      ? p.imageUrls
+      : Object.values(p.imageUrls);
+    galleryImages = [...galleryImages, ...newImages];
+  }
+
+  galleryImages = [...new Set(galleryImages)];
+
+  if (galleryImages.length === 0) {
+    galleryImages.push("https://via.placeholder.com/600x600?text=No+Image");
+  }
+
+  const mainImg = galleryImages[0];
+  // ==========================================
 
   let galleryHtml = "";
   galleryImages.forEach((img, index) => {
@@ -148,7 +168,7 @@ function renderProduct(p, pId) {
                 </div>
 
                 <h1 class="product-title display-6">${p.name || "Product Name"}</h1>
-                <p class="text-muted fs-5 mt-3 text-capitalize">${p.category || "General"}</p>
+                <p class="text-muted fs-5 mt-3 text-capitalize">${p.category || p.categoryName || "General"}</p>
 
                 <div class="price-box shadow-sm">
                     ${priceHtml}
@@ -161,7 +181,7 @@ function renderProduct(p, pId) {
                         <input type="text" id="qtyInput" class="form-control text-center fw-bold" value="1" readonly>
                         <button class="btn btn-outline-secondary px-3" type="button" onclick="window.updateQty(1)">+</button>
                     </div>
-                    <small class="text-muted d-block mt-2">${p.quantity || "Few"} items left in stock</small>
+                    <small class="text-muted d-block mt-2">${p.quantity || p.qty || "Few"} items left in stock</small>
                 </div>
 
                 <div class="mt-5 d-flex gap-3">

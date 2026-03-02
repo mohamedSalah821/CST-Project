@@ -11,6 +11,7 @@
 
   <link rel="stylesheet" href="./../css/sidebar.css">
   <link rel="stylesheet" href="./../css/products.css">
+  <link rel="stylesheet" href="./../../../assets/css/footer.css">
   <style>
     /* يخليهم دايمًا جنب بعض */
     .action-buttons {
@@ -213,6 +214,12 @@
       </div>
     </div>
   </div>
+
+      <div id="footer-placeholder" style="width: 82%; position: absolute; right: 0px;" ></div>
+
+
+     <script src="../../../assets/js/Auth/guard.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
@@ -228,6 +235,15 @@
         await mod.initSidebarAccount();
       });
   </script>
+
+   <script src="../../../assets/js/footer.js"></script>
+<script>
+    loadFooter("../../../")
+</script>
+
+  <script>
+  requireAuth(["seller"]);
+</script>
 </body>
 
 </html>

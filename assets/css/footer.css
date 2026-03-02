@@ -1,0 +1,22 @@
+.site-footer {
+    background-color: #f8f9fa; 
+}
+
+.site-footer .hover-primary {
+    transition: color 0.3s ease, padding-left 0.3s ease, transform 0.3s ease;
+    display: inline-block; 
+}
+
+.footer-links .hover-primary:hover {
+    color: #0d6efd !important; 
+    padding-left: 6px; 
+}
+
+.d-flex .hover-primary:hover {
+    color: #0d6efd !important;
+    transform: translateY(-4px); 
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}

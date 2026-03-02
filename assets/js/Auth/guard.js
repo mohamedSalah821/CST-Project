@@ -1,14 +1,33 @@
-function requireAuth(allowedRoles = []) {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
 
-  // مفيش لوجين لسه
-  if (!user) {
-    window.location.href = "/login.html";
+// ==================== Protect Pages ====================
+function requireAuth(allowedRoles = []) {
+
+  if (!currentUser) {
+    
+      window.location.href = "../../../login.html";
+    alert("Please login first");
+    
     return;
   }
 
-  //  نعمل اتشيك علي الرول
-  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
-    window.location.href = "/index.html";
+  if (!allowedRoles.includes(currentUser.role)) {
+      window.location.href = "../../../login.html";
+    alert("Access denied");
+
+    return;
+  }
+}
+
+// ==================== Prevent Login Page Access ====================
+function redirectIfLoggedIn() {
+  if (!currentUser) return;
+
+  if (currentUser.role === "admin") {
+    window.location.href = "../../../pages/admin/dashboard.html";
+  } else if (currentUser.role === "seller") {
+    window.location.href = "../../../pages/seller/html/seller-dashboard.html";
+  } else {
+    window.location.href = "../../../pages/customer/customer-products.html";
   }
 }

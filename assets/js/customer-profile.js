@@ -49,7 +49,7 @@ document.getElementById("profileForm").addEventListener("submit", (e) => {
   localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
   // saving the updated user data in Firebase (optional, if you want to keep it synced)
   const userRef = ref(db, `users/${loggedInUser.id}`);
-  set(userRef, loggedInUser);
+  // set(userRef, loggedInUser);
 
   // show success message 
   setTimeout(() => {

@@ -6,6 +6,7 @@
     <title>My Cart - ShopFlow</title>
     <link rel="stylesheet" href="../../assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../../assets/css/navbar.css" />
+    <link rel="stylesheet" href="../../assets/css/footer.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -94,55 +95,6 @@
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-      <div class="container">
-        <div class="row g-4">
-          <div class="col-lg-3">
-            <div class="footer-brand">
-              <i class="fas fa-cube text-primary me-2"></i>
-              <strong>ShopFlow</strong>
-            </div>
-            <p class="footer-tagline">
-              Your trusted multi-vendor marketplace for quality products from
-              verified sellers worldwide.
-            </p>
-          </div>
-          <div class="col-lg-3">
-            <h6 class="footer-heading">Shop</h6>
-            <ul class="footer-links">
-              <li><a href="customer-products.html">All Products</a></li>
-              <li><a href="#">Electronics</a></li>
-              <li><a href="#">Accessories</a></li>
-              <li><a href="#">Clothing</a></li>
-            </ul>
-          </div>
-          <div class="col-lg-3">
-            <h6 class="footer-heading">Account</h6>
-            <ul class="footer-links">
-              <li><a href="../../login.html">Sign In</a></li>
-              <li><a href="../../register.html">Register</a></li>
-              <li><a href="cart.html">Cart</a></li>
-            </ul>
-          </div>
-          <div class="col-lg-3">
-            <h6 class="footer-heading">Company</h6>
-            <ul class="footer-links">
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <p>
-            2026 ShopFlow. All rights reserved. This is a demo e-commerce UI.
-          </p>
-        </div>
-      </div>
-    </footer>
-
     <!-- Clear Cart Confirmation Modal -->
     <div
       class="modal fade"
@@ -179,12 +131,22 @@
       </div>
     </div>
 
+    <div id="footer-placeholder"></div>
+
     <!-- Scripts - order matters -->
+     <script src="../../assets/js/Auth/guard.js"></script>
+
     <script src="../../assets/js/navbar.js"></script>
+    <script src="../../assets/js/footer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../../assets/js/cart.js"></script>
     <script>
       loadNavbar("../../");
+      loadFooter("../../");
     </script>
+
+    <script>
+  requireAuth(["customer"]);
+</script>
   </body>
 </html>

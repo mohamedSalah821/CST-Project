@@ -8,7 +8,6 @@ body {
     overflow: hidden;
 }
 
-/* تنسيق الفورم */
 .form-control {
     padding: 0.75rem 1rem;
     border-radius: 8px;
@@ -21,7 +20,6 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.1);
 }
 
-/* تنسيق الجدول */
 .custom-table {
     border-collapse: separate;
     border-spacing: 0 8px;
@@ -65,7 +63,6 @@ body {
     border-bottom-right-radius: 8px;
 }
 
-/* بادجات الحالات (Status Badges) */
 .badge-status {
     padding: 6px 12px;
     border-radius: 6px;
