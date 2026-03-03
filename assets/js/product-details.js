@@ -162,8 +162,7 @@ function renderProduct(p, pId) {
 
             <div class="col-lg-6">
                 <div class="d-flex align-items-center mb-3 gap-3">
-                    <span class="brand-badge"><i class="fas fa-tag me-1"></i> ${p.brand || "ShopFlow"}</span>
-                    <span class="text-warning fw-bold"><i class="fas fa-star"></i> ${p.rating || "4.5"} <span class="text-muted fw-normal">(${p.ratingsCount || 0} ratings)</span></span>
+                    <span class="brand-badge"><i class="fas fa-tag me-1"></i> ${p.brand || "BLUE LINK"}</span>                    <span class="text-warning fw-bold"><i class="fas fa-star"></i> ${p.rating || "4.5"} <span class="text-muted fw-normal">(${p.ratingsCount || 0} ratings)</span></span>
                     <span class="text-success fw-bold"><i class="fas fa-shopping-basket"></i> ${p.sold || Math.floor(Math.random() * 100)} sold</span>
                 </div>
 
