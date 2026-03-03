@@ -68,8 +68,7 @@ function setupAuthentication(rootPath) {
         logoutBtn.addEventListener("click", function (e) {
           e.preventDefault(); 
           
-          localStorage.clear(); 
-          
+         localStorage.removeItem("currentUser");          
           window.location.href = `${rootPath}login.html`; 
         });
     }
