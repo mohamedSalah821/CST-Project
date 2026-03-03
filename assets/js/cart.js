@@ -1,18 +1,36 @@
 // ============================================================
 // assets/js/cart.js  —  Task 3: Cart & Transactions
+//
+// Firebase structure:
+//   carts/{productId} = { ...productData, qty, userId }
+//
+// On addToCart: save to localStorage + write to Firebase with userId
+// On login (login.js): fetch all carts, filter by userId, write to localStorage
+// On logout (navbar.js): remove shopflow_cart from localStorage
 // ============================================================
 
 import { db } from "./firebase.js";
 import {
   ref,
-  push,
   set,
+  get,
+  remove,
+  push,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const CART_KEY = "shopflow_cart";
 const TAX_RATE = 0.08;
 
-// ── read / write localStorage ─────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────
+function getUid() {
+  const user = getUser();
+  return user?.id || null; // FK → users/{id} in Firebase
+}
+function getUser() {
+  return JSON.parse(localStorage.getItem("currentUser") || "null");
+}
+
+// ── localStorage helpers ──────────────────────────────────────
 export function getCart() {
   try {
     return JSON.parse(localStorage.getItem(CART_KEY)) || [];
@@ -20,10 +38,12 @@ export function getCart() {
     return [];
   }
 }
-export function saveCart(cart) {
+function saveLocal(cart) {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  updateNavBadge();
+  const qty = cart.reduce((s, i) => s + i.qty, 0);
+  localStorage.setItem("badge_cart_qty", qty);
 }
+
 export function calculateTotals(cart) {
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const tax = +(subtotal * TAX_RATE).toFixed(2);
@@ -34,6 +54,7 @@ export function calculateTotals(cart) {
 // ── navbar badge ──────────────────────────────────────────────
 function updateNavBadge() {
   const qty = getCart().reduce((s, i) => s + i.qty, 0);
+  localStorage.setItem("badge_cart_qty", qty);
   const badge = document.querySelector(".cart-nav-badge");
   if (!badge) return;
   badge.textContent = qty;
@@ -41,24 +62,23 @@ function updateNavBadge() {
 }
 
 // ── addToCart ─────────────────────────────────────────────────
-// product object is passed directly from products.js — NO Firebase fetch needed
-export function addToCart(product, qty = 1) {
-  // Not logged in → redirect to login
-  const user = JSON.parse(localStorage.getItem("currentUser"));
+export async function addToCart(product, qty = 1) {
+  const user = getUser();
   if (!user) {
     window.location.href = "../../login.html";
     return;
   }
 
+  const uid = getUid();
   const cart = getCart();
-  const existingIndex = cart.findIndex((item) => item.id === product.id);
+  const index = cart.findIndex((i) => i.id === product.id);
 
-  if (existingIndex !== -1) {
-    // already in cart → just increase qty
-    cart[existingIndex].qty += qty;
+  if (index !== -1) {
+    cart[index].qty += qty;
   } else {
     cart.push({
       id: product.id,
+      userId: uid, // ← userId stored in item
       sellerId: product.sellerId || "",
       name: product.name || "Product",
       brand: product.brand || "",
@@ -72,14 +92,24 @@ export function addToCart(product, qty = 1) {
     });
   }
 
-  saveCart(cart);
+  saveLocal(cart);
+  updateNavBadge();
   showToast(`"${product.name}" added to cart successfully!`);
+
+  // Sync to Firebase: carts/{productId} with userId inside the object
+  const item = cart.find((i) => i.id === product.id);
+  set(ref(db, `carts/${product.id}`), item).catch(console.error);
 }
 
 // ── removeFromCart ────────────────────────────────────────────
 function removeFromCart(productId) {
-  saveCart(getCart().filter((i) => i.id !== productId));
+  const cart = getCart().filter((i) => i.id !== productId);
+  saveLocal(cart);
+  updateNavBadge();
   renderCartPage();
+
+  // Remove from Firebase
+  remove(ref(db, `carts/${productId}`)).catch(console.error);
 }
 
 // ── updateQty ─────────────────────────────────────────────────
@@ -87,28 +117,45 @@ function updateQty(productId, change) {
   const cart = getCart();
   const index = cart.findIndex((i) => i.id === productId);
   if (index === -1) return;
+
   cart[index].qty += change;
-  if (cart[index].qty <= 0) cart.splice(index, 1);
-  saveCart(cart);
+
+  if (cart[index].qty <= 0) {
+    cart.splice(index, 1);
+    remove(ref(db, `carts/${productId}`)).catch(console.error);
+  } else {
+    set(ref(db, `carts/${productId}`), cart[index]).catch(console.error);
+  }
+
+  saveLocal(cart);
+  updateNavBadge();
   renderCartPage();
 }
 
 // ── clearCart ─────────────────────────────────────────────────
 function clearCart() {
-  // Show Bootstrap modal instead of browser confirm()
   const modal = new bootstrap.Modal(document.getElementById("clearCartModal"));
   modal.show();
 
-  // Confirm button inside modal does the actual clearing
-  document.getElementById("confirm-clear-btn").onclick = function () {
-    localStorage.removeItem(CART_KEY);
+  document.getElementById("confirm-clear-btn").onclick = async function () {
+    const uid = getUid();
+    const cart = getCart();
+
+    // Remove each item that belongs to this user from Firebase
+    for (const item of cart) {
+      if (item.userId === uid) {
+        remove(ref(db, `carts/${item.id}`)).catch(console.error);
+      }
+    }
+
+    saveLocal([]);
     updateNavBadge();
     renderCartPage();
     modal.hide();
   };
 }
 
-// ── renderCartPage  (runs on cart.html) ───────────────────────
+// ── renderCartPage (runs only on cart.html) ───────────────────
 function renderCartPage() {
   const emptyState = document.getElementById("empty-state");
   const hasItems = document.getElementById("cart-has-items");
@@ -136,12 +183,8 @@ function renderCartPage() {
     .map(
       (item) => `
     <div class="cart-item-card">
-      <img
-        src="${item.imageUrl}"
-        alt="${item.name}"
-        class="cart-item-img"
-        onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'"
-      />
+      <img src="${item.imageUrl}" alt="${item.name}" class="cart-item-img"
+           onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'"/>
       <div class="cart-item-body">
         <div class="cart-item-top">
           <p class="cart-item-name">${item.name}</p>
@@ -175,20 +218,18 @@ function renderCartPage() {
   document.getElementById("summary-total").textContent = `$${total.toFixed(2)}`;
 }
 
-// ── placeOrder (used by checkout.js) ─────────────────────────
-// Order structure matches exactly:
-// { id, customer, date, status, address, items: [{name, price, qty}] }
+// ── placeOrder (called by checkout.js) ───────────────────────
 export async function placeOrder(shippingInfo) {
   const cart = getCart();
   if (!cart.length) return false;
 
-  const user = JSON.parse(localStorage.getItem("currentUser"));
+  const user = getUser();
+  const uid = getUid();
   const safeId = (user?.id || user?.email || "guest").replace(/[.#$[\]]/g, "_");
   const dateStr = new Date().toISOString().split("T")[0];
 
-  // Build order matching the required structure exactly
   const order = {
-    id: "", // filled in after push
+    id: "",
     customer:
       user?.name || `${shippingInfo.firstName} ${shippingInfo.lastName}`,
     date: dateStr,
@@ -202,14 +243,16 @@ export async function placeOrder(shippingInfo) {
     })),
   };
 
-  // Push to Firebase: orders/{customerId}/{autoId}
   const newRef = await push(ref(db, `orders/${safeId}`), order);
   const shortId = "ORD-" + newRef.key.substring(1, 9).toUpperCase();
-
-  // Write the generated id back into the same node
   await set(ref(db, `orders/${safeId}/${newRef.key}/id`), shortId);
 
-  localStorage.removeItem(CART_KEY);
+  // Remove this user's cart items from Firebase
+  for (const item of cart) {
+    await remove(ref(db, `carts/${item.id}`));
+  }
+
+  saveLocal([]);
   updateNavBadge();
   return true;
 }
@@ -236,7 +279,7 @@ export function showToast(message, type = "success") {
   }, 2800);
 }
 
-// ── expose to window (for onclick attributes in HTML) ─────────
+// ── expose to window ──────────────────────────────────────────
 window.removeFromCart = removeFromCart;
 window.updateQty = updateQty;
 window.clearCart = clearCart;
