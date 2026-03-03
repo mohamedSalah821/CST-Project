@@ -1,3 +1,6 @@
+const FIREBASE_URL =
+  "https://ecommerce-multi-actor-default-rtdb.firebaseio.com";
+
 /**
  * دالة لتحميل الناف بار في أي صفحة
  * @param {string} rootPath - مسار الوصول للروت
@@ -13,16 +16,15 @@ function loadNavbar(rootPath = "") {
       return response.text();
     })
     .then((htmlData) => {
-      // 1. استبدال المتغيرات بالمسار الصحيح
+      // replace the variables with the right root
       const finalHtml = htmlData.replace(/{{root}}/g, rootPath);
       navbarContainer.innerHTML = finalHtml;
 
-      // 2. تفعيل وظائف تسجيل الدخول والتعرف على المستخدم
       setupAuthentication(rootPath);
 
-      // 3. تفعيل لون الصفحة الحالية (Active Link)
       highlightActiveLink();
-      setupWishlistNavGuard(rootPath);
+
+      updateNavBadges();
     })
     .catch((error) => console.error("Error loading the navbar:", error));
 }
@@ -41,11 +43,15 @@ function setupAuthentication(rootPath) {
 
   if (loggedInUser) {
     //hide login btns and show profile
-    guestMenu.classList.add("d-none");
-    guestMenu.classList.remove("d-flex");
+    if (guestMenu) {
+      guestMenu.classList.add("d-none");
+      guestMenu.classList.remove("d-flex");
+    }
 
-    userMenu.classList.remove("d-none");
-    userMenu.classList.add("d-flex");
+    if (userMenu) {
+      userMenu.classList.remove("d-none");
+      userMenu.classList.add("d-flex");
+    }
 
     // show username
     if (usernameDisplay) {
@@ -54,23 +60,23 @@ function setupAuthentication(rootPath) {
 
     // set profile link based on role
     if (profileLink) {
-        if (loggedInUser.role === "admin") {
-          profileLink.href = `${rootPath}pages/admin/admin-profile.html`;
-        } else if (loggedInUser.role === "seller") {
-          profileLink.href = `${rootPath}pages/seller/profile.html`;
-        } else {
-          profileLink.href = `${rootPath}pages/customer/customer-profile.html`;
-        }
+      if (loggedInUser.role === "admin") {
+        profileLink.href = `${rootPath}pages/admin/admin-profile.html`;
+      } else if (loggedInUser.role === "seller") {
+        profileLink.href = `${rootPath}pages/seller/profile.html`;
+      } else {
+        profileLink.href = `${rootPath}pages/customer/customer-profile.html`;
+      }
     }
 
     // logout btn
     if (logoutBtn) {
-        logoutBtn.addEventListener("click", function (e) {
-          e.preventDefault(); 
-          
-         localStorage.removeItem("currentUser");          
-          window.location.href = `${rootPath}login.html`; 
-        });
+      logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        // localStorage.removeItem("currentUser");
+        localStorage.clear();
+        window.location.href = `${rootPath}login.html`;
+      });
     }
   }
 }
@@ -95,3 +101,50 @@ function highlightActiveLink() {
     }
   });
 }
+
+// update the badges in all pages
+function updateNavBadges() {
+    const loggedInUser = JSON.parse(localStorage.getItem("currentUser"));
+    
+    // 1. update cart badge
+    const cartBadge = document.querySelector(".cart-nav-badge");
+    if (cartBadge) {
+        const cartData = JSON.parse(localStorage.getItem("shopflow_cart")) || [];
+        let totalItems = 0;
+        
+        cartData.forEach(item => {
+            totalItems += parseInt(item.qty || item.quantity || 1);
+        });
+
+        if (totalItems > 0) {
+            cartBadge.style.display = "flex";
+            cartBadge.textContent = totalItems;
+        } else {
+            cartBadge.style.display = "none";
+        }
+    }
+
+    // 2. update wishlist 
+    const wishBadge = document.querySelector(".wish-nav-badge");
+    if (wishBadge) {
+        if (loggedInUser && loggedInUser.id) {
+            fetch(`${FIREBASE_URL}/wishlists/${loggedInUser.id}.json`)
+                .then(res => res.json())
+                .then(data => {
+                    const wishCount = data ? Object.keys(data).length : 0;
+                    if (wishCount > 0) {
+                        wishBadge.style.display = "flex";
+                        wishBadge.textContent = wishCount;
+                    } else {
+                        wishBadge.style.display = "none";
+                    }
+                })
+                .catch(err => console.error("Error fetching wishlist:", err));
+        } else {
+            wishBadge.style.display = "none";
+        }
+    }
+}
+
+// make the function as global to can add it in any page 
+window.updateNavBadges = updateNavBadges;
