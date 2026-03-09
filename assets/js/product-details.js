@@ -5,7 +5,7 @@ import {
   ref,
   get,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { addToCart } from "./cart.js";
+import { addToCart, showToast } from "./cart.js";
 import { toggleWishHeart, isInWishlist } from "./wishlist.js";
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -180,7 +180,11 @@ function renderProduct(p, pId) {
                         <input type="text" id="qtyInput" class="form-control text-center fw-bold" value="1" readonly>
                         <button class="btn btn-outline-secondary px-3" type="button" onclick="window.updateQty(1)">+</button>
                     </div>
-                    <small class="text-muted d-block mt-2">${p.quantity || p.qty || "Few"} items left in stock</small>
+                    ${
+                      Number(p.quantity) === 0
+                        ? `<small class="text-danger fw-bold d-block mt-2">0 items left in stock</small>`
+                        : `<small class="text-muted d-block mt-2">${p.quantity || p.qty || "Few"} items left in stock</small>`
+                    }
                 </div>
 
                 <div class="mt-5 d-flex gap-3">
@@ -222,8 +226,9 @@ window.updateQty = function (change) {
   const input = document.getElementById("qtyInput");
   let currentVal = parseInt(input.value);
   let newVal = currentVal + change;
+  const stock = currentProduct ? Number(currentProduct.quantity) : 10;
 
-  if (newVal >= 1 && newVal <= 10) {
+  if (newVal >= 1 && newVal <= stock) {
     input.value = newVal;
   }
 };
@@ -237,6 +242,12 @@ window.addToCartFromDetails = function () {
   const user = JSON.parse(localStorage.getItem("currentUser"));
   if (!user) {
     window.location.href = "../../login.html";
+    return;
+  }
+
+  // Block if out of stock
+  if (Number(currentProduct.quantity) <= 0) {
+    showToast(`"${currentProduct.name}" is out of stock.`, "warning");
     return;
   }
 

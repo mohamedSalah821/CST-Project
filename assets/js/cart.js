@@ -69,14 +69,39 @@ export async function addToCart(product, qty = 1) {
     return;
   }
 
+  // Check stock in Firebase before adding
+  if (product.sellerId && product.id) {
+    const stockSnap = await get(
+      ref(db, `seller-products/${product.sellerId}/${product.id}/quantity`),
+    );
+    const availableStock = stockSnap.exists() ? Number(stockSnap.val()) : 0;
+
+    const cart = getCart();
+    const existingItem = cart.find((i) => i.id === product.id);
+    const currentQtyInCart = existingItem ? existingItem.qty : 0;
+
+    if (availableStock <= 0) {
+      showToast(`"${product.name}" is out of stock.`, "warning");
+      return;
+    }
+
+    if (currentQtyInCart + qty > availableStock) {
+      showToast(
+        `Only ${availableStock - currentQtyInCart} item(s) left in stock for "${product.name}".`,
+        "warning",
+      );
+      return;
+    }
+  }
+
   const uid = getUid();
-  const cart = getCart();
-  const index = cart.findIndex((i) => i.id === product.id);
+  const cart2 = getCart();
+  const index = cart2.findIndex((i) => i.id === product.id);
 
   if (index !== -1) {
-    cart[index].qty += qty;
+    cart2[index].qty += qty;
   } else {
-    cart.push({
+    cart2.push({
       id: product.id,
       userId: uid, // ← userId stored in item
       sellerId: product.sellerId || "",
@@ -92,12 +117,12 @@ export async function addToCart(product, qty = 1) {
     });
   }
 
-  saveLocal(cart);
+  saveLocal(cart2);
   updateNavBadge();
   showToast(`"${product.name}" added to cart successfully!`);
 
   // Sync to Firebase: carts/{productId} with userId inside the object
-  const item = cart.find((i) => i.id === product.id);
+  const item = cart2.find((i) => i.id === product.id);
   set(ref(db, `carts/${product.id}`), item).catch(console.error);
 }
 
@@ -113,10 +138,26 @@ function removeFromCart(productId) {
 }
 
 // ── updateQty ─────────────────────────────────────────────────
-function updateQty(productId, change) {
+async function updateQty(productId, change) {
   const cart = getCart();
   const index = cart.findIndex((i) => i.id === productId);
   if (index === -1) return;
+
+  // If trying to increase, check stock first
+  if (change > 0) {
+    const item = cart[index];
+    if (item.sellerId && item.id) {
+      const stockSnap = await get(
+        ref(db, `seller-products/${item.sellerId}/${item.id}/quantity`),
+      );
+      const availableStock = stockSnap.exists() ? Number(stockSnap.val()) : 0;
+
+      if (item.qty >= availableStock) {
+        showToast(`"${item.name}" is out of stock.`, "warning");
+        return; // Don't increase qty or update badge
+      }
+    }
+  }
 
   cart[index].qty += change;
 
@@ -156,7 +197,7 @@ function clearCart() {
 }
 
 // ── renderCartPage (runs only on cart.html) ───────────────────
-function renderCartPage() {
+async function renderCartPage() {
   const emptyState = document.getElementById("empty-state");
   const hasItems = document.getElementById("cart-has-items");
   const subtitle = document.getElementById("cart-subtitle");
@@ -179,9 +220,25 @@ function renderCartPage() {
   if (subtitle)
     subtitle.textContent = `${totalQty} item${totalQty !== 1 ? "s" : ""} in your cart`;
 
+  // Fetch stock for all items in parallel
+  const stockMap = {};
+  await Promise.all(
+    cart.map(async (item) => {
+      if (item.sellerId && item.id) {
+        const snap = await get(
+          ref(db, `seller-products/${item.sellerId}/${item.id}/quantity`),
+        );
+        stockMap[item.id] = snap.exists() ? Number(snap.val()) : 0;
+      } else {
+        stockMap[item.id] = Infinity;
+      }
+    }),
+  );
+
   itemsList.innerHTML = cart
-    .map(
-      (item) => `
+    .map((item) => {
+      const atMax = item.qty >= stockMap[item.id];
+      return `
     <div class="cart-item-card">
       <img src="${item.imageUrl}" alt="${item.name}" class="cart-item-img"
            onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'"/>
@@ -199,16 +256,19 @@ function renderCartPage() {
               <i class="fas fa-minus"></i>
             </button>
             <span class="qty-value">${item.qty}</span>
-            <button class="qty-btn" onclick="window.updateQty('${item.id}', 1)">
+            <button class="qty-btn${atMax ? " qty-btn-disabled" : ""}"
+              onclick="window.updateQty('${item.id}', 1)"
+              ${atMax ? "disabled" : ""}>
               <i class="fas fa-plus"></i>
             </button>
           </div>
+          ${atMax ? `<span class="out-of-stock-label">Out of stock</span>` : ""}
           <span class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</span>
         </div>
       </div>
     </div>
-  `,
-    )
+  `;
+    })
     .join("");
 
   const { subtotal, tax, total } = calculateTotals(cart);
@@ -222,6 +282,25 @@ function renderCartPage() {
 export async function placeOrder(shippingInfo) {
   const cart = getCart();
   if (!cart.length) return false;
+
+  // ── Stock validation before placing order ─────────────────
+  for (const item of cart) {
+    if (item.sellerId && item.id) {
+      const stockSnap = await get(
+        ref(db, `seller-products/${item.sellerId}/${item.id}/quantity`),
+      );
+      const availableStock = stockSnap.exists() ? Number(stockSnap.val()) : 0;
+
+      if (availableStock <= 0) {
+        throw new Error(`"${item.name}" is out of stock.`);
+      }
+      if (item.qty > availableStock) {
+        throw new Error(
+          `Only ${availableStock} item(s) left in stock for "${item.name}".`,
+        );
+      }
+    }
+  }
 
   const user = getUser();
   const uid = getUid();
@@ -246,6 +325,22 @@ export async function placeOrder(shippingInfo) {
   const newRef = await push(ref(db, `orders/${safeId}`), order);
   const shortId = "ORD-" + newRef.key.substring(1, 9).toUpperCase();
   await set(ref(db, `orders/${safeId}/${newRef.key}/id`), shortId);
+
+  // ── Decrement stock for each item ─────────────────────────
+  for (const item of cart) {
+    if (item.sellerId && item.id) {
+      const stockSnap = await get(
+        ref(db, `seller-products/${item.sellerId}/${item.id}/quantity`),
+      );
+      if (stockSnap.exists()) {
+        const newQty = Number(stockSnap.val()) - item.qty;
+        await set(
+          ref(db, `seller-products/${item.sellerId}/${item.id}/quantity`),
+          Math.max(0, newQty),
+        );
+      }
+    }
+  }
 
   // Remove this user's cart items from Firebase
   for (const item of cart) {

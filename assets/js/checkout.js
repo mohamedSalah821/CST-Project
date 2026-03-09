@@ -127,7 +127,11 @@ window.placeOrder = async function () {
     }
   } catch (err) {
     console.error("Checkout error:", err);
-    showToast("Something went wrong. Please try again.", "warning");
+    const msg =
+      err.message && err.message.includes("stock")
+        ? err.message
+        : "Something went wrong. Please try again.";
+    showToast(msg, "warning");
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = `<i class="fas fa-lock me-2"></i> Place Order`;
